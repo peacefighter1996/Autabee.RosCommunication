@@ -1,5 +1,7 @@
 # Autabee.Roscommunicator
-This repository contains a collection of object to make it easier/possible to communicate with ROS from a .NET application. More specifically a Blazor WASM. This is partly to support UI development for the TU-Delft course `RO47007 Multidisciplinary Project 2023/24` for controlling the Mirte Master project. More information about Mirth can be found [here](https://www.mirte.org), Master version is not yet released outside of the course.
+This repository contains a collection of objects to make it easier/possible to communicate with ROS from a .NET application. More specifically a Blazor WASM. This is partly to support UI development for the TU-Delft course `RO47007 Multidisciplinary Project 2023/24` for controlling the Mirte Master project. More information about Mirth can be found [here](https://www.mirte.org), Master version is not yet released outside of the course.
+
+Basis of this project is from the Opc Scout project, which is a project that is used to communicate with OPC-UA servers. This project is also developed by the same group and can be found [here](https://github.com/Autabee/Autabee.OpcCommunication)
 
 > **Warning:** This project is still in development and is not yet ready for production use. However, support and pull requests are welcome.
 
@@ -18,8 +20,8 @@ The following libraries are used in this project:
 ## Course Usage
 This project is developed as part of the TU-Delft course `RO47007 Multidisciplinary Project 2023/24` by one of the groups. However, this project is open source and can be used by anyone. But due to the nature of the project and course development, usage comes with the following conditions.
 
-- **Attribution**: If you use this project in your project, you must attribute the original authors. This means that in documentation and presentation you must mention the original authors.
-- **Credit**: In return for supporting this project, you will be credited in the project documentation and presentation.
+- **Attribution**: If you use this project is used in your project, you must attribute the original authors. This means that in documentation and presentation you must mention the original authors.
+- **Credit**: Any contribution to this project you will be credited in the project documentation and presentation of the original authors.
 
 ## Screenshots
 
