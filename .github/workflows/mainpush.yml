@@ -18,6 +18,8 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 8.0.x
+      - name: Install webCompiler
+        run: dotnet tool install Excubo.WebCompiler --global
       - name: Restore dependencies
         run: dotnet restore ./src
       - name: Build
@@ -74,6 +76,8 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 8.0.x
+      - name: Install webCompiler
+        run: dotnet tool install Excubo.WebCompiler --global
       # - name: restore workloads
       #   run: dotnet workload install maui-windows --ignore-failed-sources
       - name: Restore dependencies
