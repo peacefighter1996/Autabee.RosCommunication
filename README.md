@@ -50,6 +50,44 @@ This is to ensure that the original authors and contributors are credited for th
 </figure>
 
 
+
+## Getting Started
+Following steps are needed to get the project up and running.
+
+### Prerequisites
+- .NET 8.0 SDK
+- Visual Studio 2022 (Recommended) or Visual Studio Code
+- Docker (Optional Useful for testing)
+
+### Installation
+1. Clone the repository
+   ```sh
+   git clone --recursive https://github.com/peacefighter1996/Autabee.RosCommunication 
+   cd Autabee.RosCommunication 
+   git submodule update --init --recursive
+    ```
+2. Open the solution in IDE of choice
+   - Visual Studio 2022
+   Open the solution file `./src/Autabee.RosScout.sln` in Visual Studio 2022. From here you can build the `Autabee.RosScout.ApiHost` using the `http` or `https` profile.
+   - Visual Studio Code 
+   Open the folder `./src` in Visual Studio Code. From here you can build the `Autabee.RosScout.ApiHost` by running the following command in the terminal.
+   ```sh
+    dotnet build Autabee.RosScout.ApiHost
+    ```
+3. Run the project
+    - Visual Studio 2022
+    Press `F5` to run the project in debug mode. This will start the API and the Blazor WASM application.
+    - Visual Studio Code
+    Run the following command in the terminal to start the API.
+    ```sh
+      dotnet run --project Autabee.RosScout.ApiHost
+    ```
+    Or for development with hot reload use the following command.
+    ```sh
+      dotnet watch --project Autabee.RosScout.ApiHost
+    ```
+4. For testing in the `./scripts/test-ros-deployment` there is a docker-compose file that can be used to test the API with a ROS bridge. This is useful as this loosens the Linux requirement for development and testing.
+
 ## To Do
 
 - [ ] Documentation for the project. Mostly in therms of architecture and how to use different parts of the project.

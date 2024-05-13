@@ -1,0 +1,39 @@
+version: '2'
+
+networks:
+  ros:
+    driver: bridge
+
+services:
+  bridge:
+    build:
+      context: ./
+      dockerfile: rosbridge.Dockerfile
+    networks:
+      - ros
+    ports:
+      - "11311:11311"
+      - "9090:9090"
+    restart: always
+
+  listener:
+    image: ros:noetic-ros-core
+    depends_on:
+      - bridge
+    environment:
+      - "ROS_MASTER_URI=http://bridge:11311"
+    command: stdbuf -o L rostopic echo /chatter
+    networks:
+      - ros
+    restart: always
+    
+  talker:
+    image: ros:noetic-ros-core
+    depends_on:
+      - bridge
+    environment:
+      - "ROS_MASTER_URI=http://bridge:11311"
+    command: stdbuf -o L rostopic pub /chatter std_msgs/String -r 0.2 "Hello from talker"
+    networks:
+      - ros
+    restart: always
