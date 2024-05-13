@@ -369,13 +369,6 @@ FodyWeavers.xsd
 
 [Ss]ecret.json
 [Ss]ecrets.json
-src/.cr
+.cr/
 
-/src/Autabee.OpcScout/wwwroot/css/*.css
-/src/Autabee.OpcScout/wwwroot/css/*.css.*
-/src/Autabee.OpcScout/Styles/*.css
-/src/Autabee.OpcScout/Styles/*.css.*
-/src/Autabee.OpcScoutWeb/data/
-/src/Autabee.OpcScoutWeb/Generated/
-/src/Autabee.OpcScoutWeb/wwwroot/sharper/models
 [Pp]rivate/
