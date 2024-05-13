@@ -112,20 +112,20 @@ jobs:
         run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-64 ./RosScout-web-win-64-self-contained.zip
       - name: zip web portable win-86
         run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-86 ./RosScout-web-win-86-self-contained.zip
-      - name: zip web portable win-arm
-        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm ./RosScout-web-win-arm-self-contained.zip
-      - name: zip web portable win-arm64
-        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm64 ./RosScout-web-win-arm64-self-contained.zip
+      # - name: zip web portable win-arm
+      #   run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm ./RosScout-web-win-arm-self-contained.zip
+      # - name: zip web portable win-arm64
+      #   run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm64 ./RosScout-web-win-arm64-self-contained.zip
       - name: zip web portable linux-64
         run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/linux-64 ./RosScout-web-linux-64-self-contained.zip
-      - name: zip web portable linux-arm64
-        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm64 ./RosScout-web-linux-arm64-self-contained.zip
-      - name: zip web portable linux-arm
-        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm ./RosScout-web-linux-arm-self-contained.zip
+      # - name: zip web portable linux-arm64
+      #   run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm64 ./RosScout-web-linux-arm64-self-contained.zip
+      # - name: zip web portable linux-arm
+      #   run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm ./RosScout-web-linux-arm-self-contained.zip
       - name: zip web portable osx-x64
         run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/osx-x64 ./RosScout-web-osx-x64-self-contained.zip
-      - name: zip web portable osx-arm64
-        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/osx-arm64 ./RosScout-web-osx-arm64-self-contained.zip
+      # - name: zip web portable osx-arm64
+      #   run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/osx-arm64 ./RosScout-web-osx-arm64-self-contained.zip
       
       - name: publish web
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -139,14 +139,9 @@ jobs:
             RosScout-web.zip
             RosScout-web-win-64-self-contained.zip
             RosScout-web-win-86-self-contained.zip
-            RosScout-web-win-arm-self-contained.zip
-            RosScout-web-win-arm64-self-contained.zip
             RosScout-web-linux-64-self-contained.zip
             RosScout-web-linux-64-self-contained.zip
-            RosScout-web-linux-arm64-self-contained.zip
-            RosScout-web-linux-arm-self-contained.zip
             RosScout-web-osx-x64-self-contained.zip
-            RosScout-web-osx-arm64-self-contained.zip
   
   # push_to_registry:
   #   needs:
