@@ -18,7 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Autabee.TerraDiscovery.BlazorWASM\Autabee.RosScout.BlazorWASM.csproj" />
+    <ProjectReference Include="..\Autabee.Communication.RosClient\Autabee.Communication.RosClient.csproj" />
+    <ProjectReference Include="..\Autabee.RosScout.BlazorWASM\Autabee.RosScout.BlazorWASM.csproj" />
   </ItemGroup>
 
 </Project>

@@ -59,7 +59,7 @@ Following steps are needed to get the project up and running.
 - Visual Studio 2022 (Recommended) or Visual Studio Code
 - Docker (Optional Useful for testing)
 
-### Installation
+### Installation and Running
 1. Clone the repository
    ```sh
    git clone --recursive https://github.com/peacefighter1996/Autabee.RosCommunication 
