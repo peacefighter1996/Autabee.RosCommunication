@@ -1,0 +1,32 @@
+name: Main Request
+
+on:
+  pull_request:
+    branches: [ main ]
+env:
+  DOTNET_NOLOGO: true                     
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
+  DOTNET_CLI_TELEMETRY_OPTOUT: true     
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    name: "build and test"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 8.0.x
+      # - name: Install MAUI Workloads
+      #   run: |
+      #     #dotnet workload install android --ignore-failed-sources
+      #     #dotnet workload install maui --ignore-failed-sources
+      #     dotnet workload install maui-windows --ignore-failed-sources
+      - name: Restore dependencies
+        run: dotnet restore ./src
+      - name: Build
+        run: dotnet build ./src --configuration Release --no-restore 
+      - name: Test
+        run: dotnet test --configuration Release --no-build --verbosity normal ./src

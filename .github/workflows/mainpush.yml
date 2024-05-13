@@ -1,0 +1,176 @@
+name: Main push
+
+on:
+  push:
+    branches: [ main ]
+env:
+  DOTNET_NOLOGO: true                     
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true 
+  DOTNET_CLI_TELEMETRY_OPTOUT: true  
+  TF_BUILD: true   
+jobs:
+  build:
+    runs-on: windows-latest
+    name: "build and test"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore dependencies
+        run: dotnet restore ./src
+      - name: Build
+        run: dotnet build ./src --configuration Release --no-restore
+      - name: Test
+        run: dotnet test --configuration Release --no-build --verbosity normal ./src
+
+  # publish_to_nuget:
+  #   needs:
+  #       - build
+  #   name: "Publish to nuget"
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v2
+  #       with:
+  #         dotnet-version: 8.0.x
+  #     - name: restore workloads
+  #       run: dotnet workload install maui-windows --ignore-failed-sources
+  #     - name: Restore dependencies
+  #       run: dotnet restore ./src
+  #     - name: Build
+  #       run: dotnet build ./src --configuration Release --no-restore
+        
+  #     - name: Publish opc client to NuGet
+  #       continue-on-error: true
+  #       uses: alirezanet/publish-nuget@v3.0.4
+  #       with:
+  #           PROJECT_FILE_PATH: src/ManagedOpcClient/Autabee.Communication.ManagedOpcClient.csproj
+  #           NUGET_KEY: ${{secrets.NUGET_KEY}}
+  #           VERSION_FILE_PATH: src/ManagedOpcClient/Autabee.Communication.ManagedOpcClient.csproj
+  #           INCLUDE_SYMBOLS: true
+  #           NO_BUILD: true
+
+  #     - name: Publish opc sharper to NuGet
+  #       continue-on-error: true
+  #       uses: alirezanet/publish-nuget@v3.0.4
+  #       with:
+  #           PROJECT_FILE_PATH: src/OpcSharper/Autabee.OpcSharper.csproj
+  #           NUGET_KEY: ${{secrets.NUGET_KEY}}
+  #           VERSION_FILE_PATH: src/OpcSharper/Autabee.OpcSharper.csproj
+  #           INCLUDE_SYMBOLS: true
+  #           NO_BUILD: true
+
+  publish_to_github:
+    needs:
+        - build
+    name: "Publish to GitHub"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 8.0.x
+      # - name: restore workloads
+      #   run: dotnet workload install maui-windows --ignore-failed-sources
+      - name: Restore dependencies
+        run: dotnet restore ./src
+        
+      - name: publish web minimal
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -o ./src/Autabee.RosScout.ApiHost/bin/publish/minimal
+      - name: publish web portable win-64
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-x64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-64
+      - name: publish web portable win-86
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-x86 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-86
+      - name: publish web portable win-arm
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-arm --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm
+      - name: publish web portable win-arm64
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-arm64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm64
+
+      - name: publish web portable linux-64
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r linux-x64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/linux-64
+      - name: publish web portable linux-arm64
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r linux-arm64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm64
+      - name: publish web portable linux-arm
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r linux-arm --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm
+
+      - name: publish web portable osx-x64
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r osx-x64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/osx-x64
+      - name: publish web portable osx-arm64
+        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r osx-arm64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/osx-arm64
+
+      - name: zip web minimal
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/minimal ./RosScout-web.zip
+      - name: zip web portable win-64
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-64 ./RosScout-web-win-64-self-contained.zip
+      - name: zip web portable win-86
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-86 ./RosScout-web-win-86-self-contained.zip
+      - name: zip web portable win-arm
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm ./RosScout-web-win-arm-self-contained.zip
+      - name: zip web portable win-arm64
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm64 ./RosScout-web-win-arm64-self-contained.zip
+      - name: zip web portable linux-64
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/linux-64 ./RosScout-web-linux-64-self-contained.zip
+      - name: zip web portable linux-arm64
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm64 ./RosScout-web-linux-arm64-self-contained.zip
+      - name: zip web portable linux-arm
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm ./RosScout-web-linux-arm-self-contained.zip
+      - name: zip web portable osx-x64
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/osx-x64 ./RosScout-web-osx-x64-self-contained.zip
+      - name: zip web portable osx-arm64
+        run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/osx-arm64 ./RosScout-web-osx-arm64-self-contained.zip
+      
+      - name: publish web
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            LICENSE.txt
+            RosScout-web.zip
+            RosScout-web-win-64-self-contained.zip
+            RosScout-web-win-86-self-contained.zip
+            RosScout-web-win-arm-self-contained.zip
+            RosScout-web-win-arm64-self-contained.zip
+            RosScout-web-linux-64-self-contained.zip
+            RosScout-web-linux-64-self-contained.zip
+            RosScout-web-linux-arm64-self-contained.zip
+            RosScout-web-linux-arm-self-contained.zip
+            RosScout-web-osx-x64-self-contained.zip
+            RosScout-web-osx-arm64-self-contained.zip
+  
+  # push_to_registry:
+  #   needs:
+  #    - build
+  #   name: Push Docker image to Docker Hub
+  #   runs-on: ubuntu-latest
+  #   steps:      
+  #     - uses: actions/checkout@v3
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v2
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v2
+  #     - name: Log in to Docker Hub
+  #       uses: docker/login-action@v2.1.0
+  #       with:
+  #         username: ${{ secrets.DOCKER_USERNAME }}
+  #         password: ${{ secrets.DOCKER_TOKEN }}
+  #     - name: Extract metadata (tags, labels) for Docker
+  #       id: meta
+  #       uses: docker/metadata-action@v4.3.0
+  #       with:
+  #         images: autabee/opcscout
+  #     - name: Build and push Docker image
+  #       uses: docker/build-push-action@v4.0.0
+  #       with:
+  #         context: ./src
+  #         file: ./src/Autabee.RosScout.ApiHost/Dockerfile
+  #         push: true
+  #         #tags: ${{ steps.meta.outputs.tags }} branch
+  #         tags: autabee/opcscout:beta
+  #         labels: ${{ steps.meta.outputs.labels }}
