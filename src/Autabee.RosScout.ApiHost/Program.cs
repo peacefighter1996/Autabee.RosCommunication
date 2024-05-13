@@ -10,12 +10,12 @@ namespace Autabee.WasmHostApi
     {
         public static void Main(string[] args)
         {
-            var config = new ConfigurationBuilder()
+            var appConfig = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+            var rosConfig = new ConfigurationBuilder()
                 .AddJsonFile("rossettings.json", optional: false, reloadOnChange: true)
                 .Build();
-
-            
 
 
             var builder = WebApplication.CreateBuilder(args);
@@ -37,17 +37,13 @@ namespace Autabee.WasmHostApi
                     });
             });
 
-            List<RosSettings> instances = new List<RosSettings>();
-            config.GetSection("RosSettings").Bind( instances );
-
             builder.Services.AddSignalR();
             builder.Services.AddHostedService<RosService>();
             builder.Services.AddTransient<RosBridgeHub>();
             builder.Services.AddSingleton<RosBridge>();
-            builder.Configuration.AddConfiguration(config);
-            builder.Services.AddTransient(s => config.GetSection("RosSettings")
-                                                     .Get<IEnumerable<RosSettings>>()
-                                         );
+            builder.Configuration.AddConfiguration(appConfig);
+            builder.Configuration.AddConfiguration(rosConfig);
+            builder.Services.AddTransient(s => rosConfig.Get<RosSettings>());
 
             var app = builder.Build();
 

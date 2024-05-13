@@ -5,7 +5,7 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
 {
     public class RosBridge
     {
-        readonly IEnumerable<RosSettings> rosSettings;
+        readonly RosSettings rosSettings;
 
         readonly Dictionary<string, AutabeeRosSocket> rosSocket = new Dictionary<string, AutabeeRosSocket>();
         readonly Dictionary<string, RosConnector> rosConnectors = new Dictionary<string, RosConnector>();  
@@ -13,11 +13,11 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
         public event Action<string, Message> SubscriptionUpdate;
 
 
-        public RosBridge(IEnumerable<RosSettings> rosSettings)
+        public RosBridge(RosSettings rosSettings)
         {
             this.rosSettings = rosSettings;
             this.rosSocket = new Dictionary<string, AutabeeRosSocket>();
-            foreach (var item in this.rosSettings)
+            foreach (var item in this.rosSettings.Profiles)
             {
                 var bridge = new AutabeeRosSocket(item.Bridge);
                 rosSocket.Add(item.Name, bridge);
@@ -35,7 +35,7 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
                 return;
             }
 
-            var host = rosSettings.FirstOrDefault(o => o.Name == hostName);
+            var host = rosSettings.Profiles.FirstOrDefault(o => o.Name == hostName);
 
             try
             {

@@ -14,7 +14,7 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
         private readonly ILogger<RosService> _logger;
         private readonly IHubContext<RosBridgeHub> _hubContext;
         private readonly RosBridge _rosBridge;
-        private readonly Dictionary<string, RosSettings> _rosConnectors;
+        private readonly Dictionary<string, RosProfile> _rosConnectors;
 
         public RosService(ILogger<RosService> logger, IHubContext<RosBridgeHub> hubContext, RosBridge rosBridge)
         {

@@ -1,6 +1,6 @@
 @Autabee.WasmHostApi_HostAddress = http://localhost:5286
 
-GET {{Autabee.WasmHostApi_HostAddress}}/weatherforecast/
+GET {{Autabee.WasmHostApi_HostAddress}}/api/Robots/getAllRobotSettings
 Accept: application/json
 
 ###

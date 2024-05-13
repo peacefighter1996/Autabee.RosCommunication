@@ -1,16 +1,16 @@
 {
-    "RosSettings": [
-        {
-            "Name": "default",
-            "Version": "Noetic",
-            "Master": "http://localhost:11311",
-            "Bridge": "http://localhost:9090"
-        },
-        {
-            "Name": "TerraDiscovery1",
-            "Version": "Noetic",
-            "Master": "http://localhost:11311",
-            "Bridge": "http://localhost:9090"
-        }
-    ]
+  "Profiles": [
+    {
+      "Version": "Noetic",
+      "Bridge": "ws://localhost:9090",
+      "Master": "http://localhost:11311",
+      "Name": "TerraDiscovery1"
+    },
+    {
+      "Version": "Noetic",
+      "Bridge": "ws://localhost:9090",
+      "Master": "http://localhost:11311",
+      "Name": "default"
+    }
+  ]
 }
