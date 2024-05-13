@@ -89,22 +89,22 @@ jobs:
         run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-x64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-64
       - name: publish web portable win-86
         run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-x86 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-86
-      - name: publish web portable win-arm
-        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-arm --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm
-      - name: publish web portable win-arm64
-        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-arm64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm64
+      #- name: publish web portable win-arm
+      #  run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-arm --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm
+      #- name: publish web portable win-arm64
+      #  run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r win-arm64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/win-arm64
 
       - name: publish web portable linux-64
         run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r linux-x64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/linux-64
-      - name: publish web portable linux-arm64
-        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r linux-arm64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm64
-      - name: publish web portable linux-arm
-        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r linux-arm --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm
+       #- name: publish web portable linux-arm64
+       #  run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r linux-arm64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm64
+       #- name: publish web portable linux-arm
+       #  run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r linux-arm --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/linux-arm
 
       - name: publish web portable osx-x64
         run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r osx-x64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/osx-x64
-      - name: publish web portable osx-arm64
-        run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r osx-arm64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/osx-arm64
+       #- name: publish web portable osx-arm64
+       #  run: dotnet publish ./src/Autabee.RosScout.ApiHost -c Release -r osx-arm64 --self-contained true -o ./src/Autabee.RosScout.ApiHost/bin/publish/osx-arm64
 
       - name: zip web minimal
         run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/minimal ./RosScout-web.zip
