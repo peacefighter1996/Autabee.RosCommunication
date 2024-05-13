@@ -127,20 +127,19 @@ jobs:
       # - name: zip web portable osx-arm64
       #   run: powershell Compress-Archive ./src/Autabee.RosScout.ApiHost/bin/publish/osx-arm64 ./RosScout-web-osx-arm64-self-contained.zip
       
-      - name: publish web
-        uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: ncipollo/release-action@v1.14.0
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
+          artifacts: "LICENSE.txt,RosScout-web.zip,RosScout-web-win-64-self-contained.zip,RosScout-web-win-86-self-contained.zip,RosScout-web-linux-64-self-contained.zip,RosScout-web-osx-x64-self-contained.zip"
+          makeLatest: true
           prerelease: true
+          tag: "Latest"
           title: "Development Build"
-          files: |
-            LICENSE.txt
-            RosScout-web.zip
-            RosScout-web-win-64-self-contained.zip
-            RosScout-web-win-86-self-contained.zip
-            RosScout-web-linux-64-self-contained.zip
-            RosScout-web-osx-x64-self-contained.zip
+            
+            
+            
+            
+            
+            
   
   # push_to_registry:
   #   needs:
