@@ -1,0 +1,170 @@
+﻿@import "_app.style.scss";
+
+
+$color-table-data: #f2f2f2;
+$color-main-background: #e6e6e6;
+$color-navmenu: #cccccc;
+
+
+$color-main-text:black;
+
+html, body {
+    background-color: $color-main-background;
+    scrollbar-base-color: adjust-color($color-main-background,$lightness: 10);
+    color: black;
+}
+
+
+
+.node-img > img {
+    height: 12px;
+}
+
+th {
+    background: $color-primary;
+}
+
+.autabee-table tr:nth-child(even)
+{
+    background: adjust-color($color-main-background,$lightness: 5);
+}
+
+.StructItem {
+    background: adjust-color($color-main-background, $lightness: -10);
+}
+
+
+/*.SubscriptionView tr:nth-child(odd), .data-item:nth-child(odd), .node-set > *:nth-child(odd), .logitem:nth-child(odd), .OpcNodeViewer tr:nth-child(odd) {
+    background: adjust-color($color-main-background,$lightness: 3);
+}*/
+/*
+.SubscriptionView tr:nth-child(even), .data-item:nth-child(even), .Node:nth-child(even), .logitem:nth-child(even) {
+    background: adjust-color($color-main-background,$lightness: 8);
+}*/
+
+table.datatable > tbody > tr:nth-child(even),
+div.datatable:nth-child(2n+3) {
+    background-color: adjust-color($color-main-background, $lightness: -10);
+}
+
+button:hover {
+    background-color: $color-secendary;
+}
+
+input {
+    border-color: adjust-color($color-main-background,$lightness: -10);
+}
+
+.mid-ViewPort {
+    border-left: 2px solid $color-primary;
+    border-right: 2px solid $color-primary
+}
+
+
+.Node:hover {
+    background: $color-secendary;
+}
+
+.Node-Selected {
+    color: white;
+    background: $color-secendary;
+}
+
+.Node-Selected >td {
+    color: white;
+    background: $color-secendary;
+}
+
+.Node-Selected:hover {
+    color: white;
+    background: adjust-color($color-secendary,$lightness: -10);
+}
+
+.Node button:hover {
+    background-color: adjust-color($color-secendary,$lightness: -10);
+}
+.Node-Selected > button:hover {
+    color: white;
+    background: $color-secendary;
+}
+
+.Root-Node > thead{
+    background: $color-primary;
+}
+
+.InActiveAtribute {
+    color: adjust-color($color-main-text,$lightness: 30);
+}
+
+.OpcNodeViewer button:hover {
+    background-color: adjust-color($color-secendary,$lightness: -10);
+}
+
+.Viewport h3 {
+    background-color: #FFD000;
+}
+
+.Viewport  {
+    /*resize: both;*/
+}
+
+.Viewportheader {
+    background-color: #FFD000;
+}
+
+.Viewportheader > button {
+    background-color: transparent;
+}
+
+.Viewportheader > button:hover {
+    background-color: adjust-color($color-primary,$lightness: -10);
+}
+
+
+
+.log-message {
+    white-space: pre-line;
+}
+
+.log-message-short {
+    white-space: pre-line;
+}
+
+.top-row {
+    background-color: adjust-color($color-navmenu,$lightness: -10);
+    color: black;
+}
+
+.Empty {
+    background-color: $color-info;
+    color: white;
+    padding: 10px;
+    font-size: 22px;
+    text-align: center;
+    font-style: italic;
+}
+
+button.Danger {
+    background-color: $color-error;
+    color: white;
+    font-weight: $bold;
+}
+
+button.Info {
+    background-color: $color-info;
+    color: white;
+    font-weight: $bold;
+}
+
+button.Info:hover, button.Danger:hover {
+    background-color: adjust-color($color-primary,$lightness: -5);
+}
+
+dialog, .blazor-context-menu--default {
+    background: adjust-color($color-main-background,$lightness: -5);
+    border-color: adjust-color(black,$lightness: 5);
+}
+
+select {
+    border-color: adjust-color($color-main-background,$lightness: -10);
+}

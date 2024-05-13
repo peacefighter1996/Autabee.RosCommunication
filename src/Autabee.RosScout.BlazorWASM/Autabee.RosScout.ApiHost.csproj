@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.EventSource" Version="8.0.0" />
+    <PackageReference Include="MudBlazor" Version="6.19.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="rosbridge-client-ros" Version="1.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+        <Watch Include="**\*.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Watch Remove="Styles\_app.style.scss" />
+    <Watch Remove="Styles\_app.var.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\css\app.dark.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Autabee.RosConnector\Autabee.Communication.RosClient.csproj" />
+  </ItemGroup>
+
+  <Target Name="ToolRestore" BeforeTargets="PreBuildEvent">
+      <Exec Command="dotnet tool restore" StandardOutputImportance="high" />
+  </Target>
+  <Target Name="PreBuild" AfterTargets="AfterBuild">
+      <Exec Command="webcompiler -r Styles -o wwwroot/css -z disable" StandardOutputImportance="high" />
+  </Target>
+
+
+</Project>

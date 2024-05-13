@@ -1,0 +1,39 @@
+main {
+    display:flex;
+    flex-direction:column;
+    width: 100%;
+    height: 100vh;
+    max-height: 100%;
+}
+
+article{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow-y:auto;
+}
+.top-row {
+    display: flex;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 0px;
+}
+
+.ABnavitem {
+    display: block;
+    padding: 8px 10px 5px 10px;
+    vertical-align: middle;
+    text-align-last: auto;
+    vertical-align: -webkit-baseline-middle;
+    text-decoration: none;
+    font-size: large;
+    font: 700;
+    font-weight: bold;
+}
+
+.Theme {
+    margin-left: auto;
+    float: right;
+    width: 50px;
+}
+

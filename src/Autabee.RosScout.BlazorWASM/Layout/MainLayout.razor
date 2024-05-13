@@ -1,0 +1,96 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime _jsRuntime;
+@inject UserTheme theme;
+@inject NavigationManager Navigation
+<MudThemeProvider Theme="new MudTheme()" @bind-IsDarkMode="@theme.Dark" />
+<div class="page" style="height: 100vh;">
+
+    <main>
+        <nav class="top-row">
+            @if (theme.NavDark)
+            {
+                <img class="HomeItem" src="/images/autabee_dark_transparent.svg" style="height: 40px" />
+            }
+            else
+            {
+                <img class="HomeItem" src="/images/autabee_light_transparent.svg" style="height: 40px" />
+            }
+            <button class="ABnavitem HomeItem" @onclick=NavigateTo >
+                Ros Scout
+            </button>
+
+            <button class="ABnavitem" @onclick=NavigateToLogin >
+                <span class="mdi mdi-wrench-cog" />  Diagnostics
+            </button>
+
+            <button class="ABnavitem" @onclick=NavigateToControl >
+                <span class="mdi mdi-state-machine" />  Control
+            </button>
+
+            <button class="ABnavitem" @onclick=NavigateToStatistics >
+                <span class="mdi mdi-chart-line" />  Statistics
+            </button>
+
+
+            <button class="Theme" @onclick="()=>ToggleTheme()">
+                <icon class="mdi mdi-@mdiTheme" />
+            </button>
+            <!--</nav>-->
+
+        </nav>
+
+
+        <article>
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    //private bool collapseNavMenu = true;
+
+
+
+    private string mdiTheme { get => !theme.Dark ? "weather-sunny" : "weather-night"; }
+
+    protected override void OnInitialized()
+    {
+        if (theme.NavDark)
+        _jsRuntime.InvokeVoidAsync("SetNavTheme", theme.NavThemeCss);
+        if (theme.Dark)
+        _jsRuntime.InvokeVoidAsync("SetTheme", theme.ThemeCss);
+    }
+
+
+    //private string NavMenuCssClass => collapseNavMenu ? "nav-content-hidden" : "nav-content-visable";
+
+    //private void ToggleNavMenu()
+    //{
+    //    collapseNavMenu = !collapseNavMenu;
+    //}
+
+    private void ToggleTheme()
+    {
+        theme.Dark = !theme.Dark;
+        _jsRuntime.InvokeVoidAsync("SetTheme", theme.ThemeCss);
+        _jsRuntime.InvokeVoidAsync("SetNavTheme", theme.NavThemeCss);
+    }
+
+    private void NavigateTo()
+    {
+        Navigation.NavigateTo("");
+    }
+
+    private void NavigateToLogin()
+    {
+        Navigation.NavigateTo("diagnostics");
+    }
+    private void NavigateToControl()
+    {
+        Navigation.NavigateTo("control");
+    }
+    private void NavigateToStatistics()
+    {
+        Navigation.NavigateTo("statistics");
+    }
+}

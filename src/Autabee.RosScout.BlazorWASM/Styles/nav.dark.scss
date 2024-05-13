@@ -1,0 +1,11 @@
+﻿@import "_nav.style.scss";
+
+.HomeItem {
+    color: white;
+    background-color: adjust-color(#0d0d0d,$lightness: 15);
+    font-weight: 700;
+}
+
+img.HomeItem {
+    padding:4px;
+}

@@ -1,0 +1,350 @@
+﻿@page "/diagnostics"
+@using System.Text
+@using Autabee.Communication.RosClient
+@using Autabee.Communication.RosClient.Dto
+@using Microsoft.AspNetCore.SignalR.Client
+@using Newtonsoft.Json
+@using RosSharp.RosBridgeClient
+@using std_msgs = RosSharp.RosBridgeClient.MessageTypes.Std
+@using System.Xml.Serialization
+@inject RosConnector rosConnector
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ILogger<Diagnostics> Logger
+
+
+<PageTitle>TD Diagnostics</PageTitle>
+<div id="diagnostics-container">
+    <div id="selected-master">
+        <h1>Selected Master</h1>
+        <div class="selectedMaster">
+            <label for="messageInput">Message:</label>
+            <input id="messageInput" @bind="inputMessage" @onkeydown="CheckForEnterKey" />
+            <button @onclick="PublishMessage">Publish</button>
+        </div>
+    </div>
+    @code {
+        string inputMessage = "";
+
+        private async void PublishMessage()
+        {
+            Console.WriteLine($"Publishing message {inputMessage}");
+            var message = new std_msgs.String { data = inputMessage };
+            var result = rosConnector.Publish("/subscription_test", message);
+            Console.WriteLine($"Publish result: {result}");
+
+            try
+            {
+                Console.WriteLine("Sending message to SignalR");
+                await hubConnection.SendAsync("Publish", "default", "/subscription_test");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void CheckForEnterKey(KeyboardEventArgs e)
+        {
+            StateHasChanged(); // Force UI to aram(){"autabee.blazor"});
+            if (e.Key == "Enter")
+            {
+                PublishMessage();
+            }
+        }
+    }
+
+    <div class="Viewport" id="diag-topic">
+        <h3>Topic</h3>
+        <div class="InnerItem">
+            <table class="datatable" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>topic</th>
+                        <th>data type</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var topic in topics)
+                    {
+                        <tr>
+                            <td>@topic.Name</td>
+                            <td>@topic.Type</td>
+                            <td><button @onclick="()=>Subscribe(topic)" title="subscribe" class="mdi mdi-rss-box"/></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="diag-subscription" class="Viewport">
+        <h3>Subscription</h3>
+        <div class="InnerItem">
+            <table class="datatable" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Topic</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var message in messages.TakeLast(10).Reverse())
+                    {
+                        <tr>
+                            <td>@message.Item1</td>
+                            <td>@message.Item2</td>
+                            <td>@message.Item3</td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <div class="Viewport" id="diag-node">
+        <h3>Node</h3>
+        <div class="InnerItem">
+            <table class="datatable" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Nodes</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var node in  nodes)
+                    {
+                        <tr>
+                            <td>@node</td>
+                            <td><button @onclick="()=>ShowNodeDetails(node)" title="subscribe" class="mdi mdi-magnify" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="Viewport" id="diag-details">
+        <h3>Details</h3>
+        <div class="InnerItem">
+            @if(activeDetails== ActiveDetails.Node)
+            {
+                <table class="datatable" style="width: 100%;">
+                    <tbody>
+                        <tr><td>Details of:</td><td>Node</td></tr>
+                        <tr><td>Name:</td><td>@activeNodeDetails</td></tr>
+                    </tbody>
+                </table>
+
+                @if(system.subscribers.Any(o=>o.nodes.Contains(activeNodeDetails))){
+                <table class="datatable" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Topic Subscription</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var topic in system.subscribers.Where(o=>o.nodes.Contains(activeNodeDetails)))
+                        {
+                            <tr>
+                                <td>@topic.Name</td>
+                                <td>@topic.Type</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                    </table>
+                }
+                else
+                {
+                    <table class="datatable" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>No Subscriptions</th>
+                            </tr>
+                        </thead>
+                    </table>
+                }
+
+                @if (system.publishers.Any(o => o.nodes.Contains(activeNodeDetails)))
+                {
+                    <table class="datatable" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Topic Publisher</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var topic in system.publishers.Where(o=>o.nodes.Contains(activeNodeDetails)).Select(o=> topics.FirstOrDefault(k=>k.Name == o.Name)).Where(o=> o!= null))
+                        {
+                            <tr>
+                                <td>@topic.Name</td>
+                                <td>@topic.Type</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                    </table>
+                }
+                else
+                {
+                    <table class="datatable" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>No Publishers</th>
+                            </tr>
+                        </thead>
+                    </table>
+                }
+
+                @if (system.services.Any(o => o.nodes.Contains(activeNodeDetails)))
+                {
+                    <table class="datatable" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            @foreach (var service in system.publishers.Where(o => o.nodes.Contains(activeNodeDetails)))
+                        {
+                            <tr>
+                                <td>@service.Name</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                    </table>
+                }
+                else
+                {
+                    <table class="datatable" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>No Services</th>
+                            </tr>
+                        </thead>
+                    </table>
+                }
+
+            }
+            else
+            {
+                <table class="datatable" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>No Details Selected</th>
+                        </tr>
+                    </thead>
+                </table>
+            }
+                </div>
+    </div>
+    <div class="Viewport" id="diag-publish">
+        <h3>Publish</h3>
+        <div class="InnerItem">
+        </div>
+    </div>
+    <div class="Viewport" id="diag-log">
+        <h3>Log</h3>
+        <div class="InnerItem">
+            
+        </div>
+    </div>
+
+
+
+</div>
+@code {
+    List<(DateTime, string, string)> messages = new List<(DateTime, string, string)>();
+    List<RosTopic> topics = new List<RosTopic>();
+    //List<RosService> services = new List<RosService>();
+    RosSystem system;
+    IEnumerable<string> nodes = new string[0];
+    private HubConnection? hubConnection;
+
+    enum ActiveDetails
+    {
+        None,
+        Topic,
+        Subscription,
+        Node,
+        Services,
+    }
+    ActiveDetails activeDetails = ActiveDetails.None;
+    string activeNodeDetails = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        // Setup SignalR
+        try
+        {
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/rosbridgehub"))
+                .Build();
+
+            await hubConnection.StartAsync();
+            // hubConnection.On<string, Message>("SubscriptionUpdate", (topic, message) =>
+            // {
+            //     Console.WriteLine($"Received message on {topic} with msg {message}");
+            // });
+            await hubConnection.SendAsync("Subscribe", "default", "/chatter");
+
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex.Message);
+        }
+        try
+        {
+            var result = await Http.GetFromJsonAsync<List<RosTopic>>("/api/RosMaster/getTopicTypes/rosapi");
+            Logger.LogInformation(JsonConvert.SerializeObject( result));
+            topics = result ?? new List<RosTopic>();
+
+            Logger.LogInformation("Getting system");
+
+            system = await Http.GetFromJsonAsync<RosSystem>("/api/RosMaster/getSystemState/rosapi");
+            Logger.LogInformation(system.ToString());
+            nodes = system.GetNodes();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogInformation(ex.Message);
+        }
+
+
+        var id = rosConnector.Subscribe<std_msgs.String>("/subscription_test",
+            (std_msgs.String s) => SubscriptionHandler("/subscription_test", s));        
+    }
+
+    private async void SubscriptionHandler(string topic, std_msgs.String message)
+    {
+        var json = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+        messages.Add((DateTime.Now, topic, json));
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void Subscribe(RosTopic topic)
+    {
+        Console.WriteLine($"Subscribing to {topic.Name}");
+        var id = rosConnector.Subscribe<std_msgs.String>(topic.Name, (std_msgs.String s) =>
+        {
+            Console.WriteLine($"Received message on {topic.Name}");
+            SubscriptionHandler(topic.Name, s);
+        });
+        Console.WriteLine($"Subscribed to {topic.Name} with id {id}");
+    }
+
+    private void ShowNodeDetails(string node)
+    {
+        activeDetails = ActiveDetails.Node;
+        activeNodeDetails = node;
+
+        StateHasChanged();
+    }
+}

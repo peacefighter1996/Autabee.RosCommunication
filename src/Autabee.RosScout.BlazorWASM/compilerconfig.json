@@ -1,0 +1,19 @@
+﻿[
+    {
+        "outputFile": "wwwroot/css/app.light.css",
+        "inputFile": "Styles/app.light.scss"
+    },
+    {
+        "outputFile": "wwwroot/css/nav.light.css",
+        "inputFile": "Styles/nav.light.scss"
+    },
+
+    {
+        "outputFile": "wwwroot/css/app.dark.css",
+        "inputFile": "Styles/app.dark.scss"
+    },
+    {
+        "outputFile": "wwwroot/css/nav.dark.css",
+        "inputFile": "Styles/nav.dark.scss"
+    }
+]

@@ -1,0 +1,160 @@
+﻿@import "_app.style.scss";
+
+$color-table-data: #f2f2f2;
+$color-main-background: #1a1a1a;
+$color-navmenu: #0d0d0d;
+$color-main-text: white;
+
+html, body {
+    color: $color-main-text;
+    background-color: $color-main-background;
+    scrollbar-base-color: adjust-color($color-main-background,$lightness: -10);
+}
+
+#blazor-error-ui {
+    background-color: $color-main-background;
+    color: white;
+}
+
+.InActiveAtribute {
+    color: adjust-color($color-main-text,$lightness: -30);
+}
+
+button {
+    color: $color-main-text;
+}
+
+
+table.datatable > tbody >tr:nth-child(even),
+div.datatable:nth-child(2n+3) {
+    background-color: adjust-color($color-main-background, $lightness: 10);
+}
+
+
+.StructItem {
+    background: adjust-color($color-main-background, $lightness: 10);
+}
+/*.data-item:nth-child(even), .Node:nth-child(even), .logitem:nth-child(even) {
+    background: adjust-color($color-main-background,$lightness: 10);
+}*/
+.NodeWriteHead {
+    color: black;
+}
+.mid-ViewPort {
+    border-left: 2px solid $color-primary;
+    border-right: 2px solid $color-primary
+}
+
+.Node:hover {
+    background: $color-secendary;
+}
+
+.Node-Selected:nth-child(even) {
+    color: $color-main-text;
+    background: adjust-color($color-secendary,$lightness: -10);
+}
+
+.Node-Selected {
+    color: $color-main-text;
+    background: $color-secendary;
+}
+
+.Node-Selected:hover {
+    color: $color-main-text;
+    background: $color-secendary;
+}
+
+.Node > .node-actions > button:hover {
+    background-color: adjust-color($color-secendary,$lightness: -10);
+}
+
+.ABnavitem > a {
+    text-decoration: none;
+    color: $color-main-text;
+}
+
+button:hover, .Viewportheader > button:hover {
+    background-color: $color-secendary;
+}
+
+th {
+    color: black;
+    background: $color-primary;
+}
+
+.OpcNodeViewer > table > tr > td > button:hover {
+    background-color: adjust-color($color-secendary,$lightness: -10);
+}
+
+.Viewport > h3 {
+    color: black;
+    background-color: $color-primary;
+}
+.Viewportheader {
+    background-color: #FFD000;
+}
+
+.Viewportheader > button {
+    color: black;
+}
+
+.top-row {
+    background-color: $color-navmenu;
+}
+.Empty {
+    background-color: $color-info;
+    color: white;
+    padding: 10px;
+    font-size: 22px;
+    text-align: center;
+    font-style: italic;
+}
+.Theme {
+    //background-color: #FF0090;
+    background: transparent;
+    font-size: 20px;
+    margin-left: auto;
+    border:none;
+    color:white;
+}
+
+.node-caret{
+    color: white;
+}
+
+.logitem > button{
+    background-color: transparent;
+}
+
+.logitem > button:hover {
+    background-color: $color-secendary;
+}
+
+input, select {
+    border-color: adjust-color($color-main-background,$lightness: 10);
+    background: $color-main-background;
+    color:white
+}
+
+.Root-Node > thead {
+    background: $color-primary;
+    color: black;
+}
+
+.Root-Node{
+    
+}
+
+.Root-Node > thead button {
+    color: black;
+}
+
+dialog, .blazor-context-menu--default {
+    color: white;
+    background: adjust-color($color-main-background,$lightness: -5);
+    border-color: adjust-color($color-main-background,$lightness: 10);
+}
+
+th.node-actions  > button{
+    color: black;
+}

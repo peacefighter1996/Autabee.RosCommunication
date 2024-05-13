@@ -1,0 +1,46 @@
+
+#diagnostics-container {
+    grid-template-areas:
+      'selected-master diag-subscription diag-subscription diag-subscription'
+      'diag-topic      diag-subscription diag-subscription diag-subscription'
+      'diag-topic diag-subscription diag-subscription diag-subscription'
+      'diag-node diag-details diag-publish diag-log'
+      'diag-node diag-details diag-publish diag-log';
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 60px 1fr 1fr 1fr 1fr;
+    display: grid;
+    height: 100vh;
+  } 
+
+  #selected-master {
+    grid-area: selected-master;
+  }
+  #diag-subscription {
+    grid-area: diag-subscription;
+  }
+  #diag-topic {
+    grid-area: diag-topic;
+  }
+  #diag-node {
+    grid-area: diag-node;
+  }
+  #diag-details {
+    grid-area: diag-details;
+  }
+  #diag-publish {
+    grid-area: diag-publish;
+  }
+  #diag-log {
+    grid-area: diag-log;
+  }
+
+  /*tr:nth-child(even) {
+      background-color: azure
+  }*/
+
+.datatable button {
+    height: 100%;
+    float: right;
+    padding: 0px 1px 0px 1px;
+    width: 20px;
+}

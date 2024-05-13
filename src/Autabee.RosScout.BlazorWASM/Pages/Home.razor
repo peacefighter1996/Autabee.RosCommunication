@@ -1,0 +1,22 @@
+﻿@page "/"
+@inject UserTheme theme
+
+
+<PageTitle>Ros Scout Home</PageTitle>
+
+
+<div class="HomePage">
+    <img src="/images/autabee_@(theme.DarkString)_transparent.svg" alt="Autabee" />
+    <h1>Autabee Ros Scout</h1>
+</div>
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        theme.ThemeChanged += ThemeChanged;
+    }
+    void ThemeChanged(object sender, EventArgs e)
+    {
+        StateHasChanged();
+    }
+}
