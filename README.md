@@ -6,6 +6,19 @@ Basis of this project is from the Opc Scout project, which is a project that is 
 > :warning: **Warning** 
 > This project is still in development and is not yet ready for production use. However, support and pull requests are welcome.
 
+## Current capabilities and features
+
+- Able to talk with topics and services on a ROS bridge
+- Able to extract data from the RosMaster 
+  - Topics
+  - Services
+  - Nodes
+  - Parameters [coming soon]
+- Some initial UI design
+- Translation from XMLRPC to C# objects for easier data handling
+- Exposed Api With swagger for easy testing and development.
+- But also allows other applications to communicate with the ROS bridge / Ros master through the API.
+
 ## Projects
 The solution contains the following projects:
 
