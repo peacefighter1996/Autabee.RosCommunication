@@ -46,7 +46,7 @@ This is to ensure that the original authors and contributors are credited for th
 ## Screenshots
 
 <figure class="image">
-  <img src="https://github.com/Autabee/Autabee.RosScout/blob/main/scout.png?raw=true" alt="OpcScout">
+  <img src="https://github.com/peacefighter1996/Autabee.RosCommunication/blob/90990691e6e63a9a841ea797eb22f18efb37f295/scout.png" alt="OpcScout">
   <figcaption>Ros Scout diagnostics view (Light)</figcaption>
 </figure>
 
