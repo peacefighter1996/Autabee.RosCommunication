@@ -1,15 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Autabee.Communication.RosClient;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using RosSharp.RosBridgeClient;
 
 namespace Autabee.RosScout.WasmHostApi.Hubs
 {
-    public interface IRosView
-    {
-        void SubscriptionUpdate(string topic, Message message);
-    }
-
-    public class RosService : BackgroundService, IRosView
+    public class RosService : BackgroundService
     {
         private readonly ILogger<RosService> _logger;
         private readonly IHubContext<RosBridgeHub> _hubContext;
@@ -23,7 +19,6 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
             _rosBridge = rosBridge;
 
             _rosBridge.SubscriptionUpdate += SubscriptionUpdate;
-
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

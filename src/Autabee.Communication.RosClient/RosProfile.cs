@@ -1,4 +1,4 @@
-﻿namespace Autabee.RosScout.WasmHostApi
+﻿namespace Autabee.Communication.RosClient
 {
     public class RosSettings
     {

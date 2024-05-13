@@ -24,7 +24,8 @@ The solution contains the following projects:
 
 - **Autabee.Communication.RosClient**: This project contains helper classes and object to communicate with ROS.
 - **Autabee.RosScout.BlazorWASM**: This project contains a Blazor WASM application that can be used to control a ROS robot.
-- **Autabee.RosScout.BlazorWASM.Server**: This project contains the server side of the Blazor WASM application.
+- **Autabee.RosScout.ApiHost**: This project contains the API that is used to communicate with the ROS. This is the main project that should be started to use the API.
+- **Autabee.RosScout.Components**: This project contains the components that are used in the Blazor WASM application. This is a shared project and can be used in other Blazor/Razor projects using RosClient.
 
 ## Libraries
 The following libraries are used in this project:

@@ -1,6 +1,5 @@
 ﻿using Autabee.Communication.RosClient;
 using Autabee.Communication.RosClient.XmlRpc;
-using Autabee.RosScout.WasmHostApi;
 using Autabee.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
@@ -27,10 +26,10 @@ namespace Autabee.WasmHostApi.Controllers
             _settings = settings;
         }
 
-        [HttpGet("getAllRobotSettings/")]
+        [HttpGet("getRosSettings/")]
         public IActionResult GetRobotList()
         {
-            return Ok(_settings.Profiles);
+            return Ok(_settings);
         }
 
         [HttpGet("getRobotSettings/{robotName}")]

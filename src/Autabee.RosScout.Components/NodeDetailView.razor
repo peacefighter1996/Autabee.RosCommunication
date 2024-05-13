@@ -1,0 +1,112 @@
+﻿@using Autabee.Communication.RosClient.Dto
+
+<table class="datatable" style="width: 100%;">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Details of:</td><td>Node</td></tr>
+        <tr><td>Name:</td><td>@activeNodeDetails</td></tr>
+    </tbody>
+
+
+@if (system.subscribers.Any(o => o.nodes.Contains(activeNodeDetails)))
+{
+        <thead>
+            <tr>
+                <th>Topic Subscription</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var topic in system.subscribers.Where(o => o.nodes.Contains(activeNodeDetails)))
+            {
+                <tr>
+                    <td>@topic.Name</td>
+                    <td>@topic.Type</td>
+                </tr>
+            }
+
+        </tbody>
+}
+else
+{
+        <thead>
+            <tr>
+                <th colspan="2">No Subscriptions</th>
+            </tr>
+        </thead>
+}
+
+@if (system.publishers.Any(o => o.nodes.Contains(activeNodeDetails)))
+{
+        <thead>
+            <tr>
+                <th>Topic Publisher</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var topic in system.publishers.Where(o => o.nodes.Contains(activeNodeDetails)).Select(o => topics.FirstOrDefault(k => k.Name == o.Name)).Where(o => o != null))
+            {
+                <tr>
+                    <td>@topic.Name</td>
+                    <td>@topic.Type</td>
+                </tr>
+            }
+
+        </tbody>
+
+}
+else
+{
+        <thead>
+            <tr>
+                <th colspan="2">No Publishers</th>
+            </tr>
+        </thead>
+}
+
+@if (system.services.Any(o => o.nodes.Contains(activeNodeDetails)))
+{
+
+        <thead>
+            <tr>
+                <th colspan="2">Service</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var service in system.publishers.Where(o => o.nodes.Contains(activeNodeDetails)))
+            {
+                <tr>
+                    <td colspan="2">@service.Name</td>
+                </tr>
+            }
+
+        </tbody>
+}
+else
+{
+        <thead>
+            <tr>
+                <th colspan="2">No Services</th>
+            </tr>
+        </thead>
+}
+</table>
+@code{
+    [Parameter]
+    public string activeNodeDetails { get; set; } = string.Empty;
+
+    [Parameter]
+    public List<RosTopic> topics { get; set; } = new List<RosTopic>();
+
+    [Parameter]
+    public RosSystem system { get; set; }
+}
+
+
+

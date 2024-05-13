@@ -1,5 +1,4 @@
-
-using Autabee.RosScout.WasmHostApi;
+using Autabee.Communication.RosClient;
 using Autabee.RosScout.WasmHostApi.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;

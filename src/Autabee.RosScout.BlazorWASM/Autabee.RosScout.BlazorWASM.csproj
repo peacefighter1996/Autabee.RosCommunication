@@ -21,6 +21,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="rosbridge-client-ros" Version="1.8.0" />
     <ProjectReference Include="..\Autabee.Communication.RosClient\Autabee.Communication.RosClient.csproj" />
+    <ProjectReference Include="..\Autabee.RosScout.Components\Autabee.RosScout.Components.csproj" />
   </ItemGroup>
 
   <ItemGroup>
