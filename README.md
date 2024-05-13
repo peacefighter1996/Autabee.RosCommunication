@@ -107,8 +107,8 @@ Following steps are needed to get the project up and running.
 
 <table style="border:0px">
   <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/peacefighter1996"><img src="https://avatars.githubusercontent.com/u/15609940?s=400&u=d4484d7398221a2b894f4328ad374064a319f3f2&v=4" width="100px;" alt="I Arbouw"/><br /><sub><b>I Arbouw</b></sub></a><br />🚧💻🎨</td>
+    <tr style="border:0px">
+      <td align="center" valign="top" width="14.28%" style="border:0px"><a href="https://github.com/peacefighter1996"><img src="https://avatars.githubusercontent.com/u/15609940?s=400&u=d4484d7398221a2b894f4328ad374064a319f3f2&v=4" width="100px;" alt="I Arbouw"/><br /><sub><b>I Arbouw</b></sub></a><br />🚧💻🎨</td>
     </tr>
   </tbody>
 </table>
