@@ -1,0 +1,3 @@
+[submodule "lib/RosSharp"]
+	path = lib/RosSharp
+	url = https://github.com/Autabee/ros-sharp
