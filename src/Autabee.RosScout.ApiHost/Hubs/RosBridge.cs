@@ -7,30 +7,23 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
     {
         readonly RosSettings rosSettings;
 
-        readonly Dictionary<string, AutabeeRosSocket> rosSocket = new Dictionary<string, AutabeeRosSocket>();
-        readonly Dictionary<string, RosConnector> rosConnectors = new Dictionary<string, RosConnector>();  
-
-        public event Action<string, Message> SubscriptionUpdate;
-
+        readonly Dictionary<string, RosSocket> rosSocket = new Dictionary<string, RosSocket>();
+        public event Action<string, string, string> SubscriptionUpdate;
 
         public RosBridge(RosSettings rosSettings)
         {
             this.rosSettings = rosSettings;
-            this.rosSocket = new Dictionary<string, AutabeeRosSocket>();
+            this.rosSocket = new Dictionary<string, RosSocket>();
             foreach (var item in this.rosSettings.Profiles)
             {
-                var bridge = new AutabeeRosSocket(item.Bridge);
+                var bridge = new RosSocket(new RosSharp.RosBridgeClient.Protocols.WebSocketNetProtocol(item.Bridge), true);
                 rosSocket.Add(item.Name, bridge);
-
-                var bridge2 = new RosConnector(item.Bridge);
-                rosConnectors.Add(item.Name, bridge2);
-                //bridge.TypeMapping.Add(RosSharpTypeMappings.GetStdTypeMapping());
             }
         }
 
         public async void Subscribe(string caller,string hostName, string topic)
         {
-            if (!rosSocket.TryGetValue(hostName, out AutabeeRosSocket rosConnector))
+            if (!rosSocket.TryGetValue(hostName, out RosSocket socket))
             {
                 return;
             }
@@ -53,7 +46,7 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
                     return;
                 }
 
-                //var connection = rosConnector.Subscribe(topicTypes, _SubscriptionUpdate);
+                var connection = socket.Subscribe(topicTypes.Type, topic, parseData);
 
                 return;
             }
@@ -63,24 +56,56 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
             }
 
         }
+        public void Subscribe(string? caller, string hostName, string topic, string rosMsgName)
+        {
+            if (!rosSocket.TryGetValue(hostName, out RosSocket socket))
+            {
+                return;
+            }
+
+            var host = rosSettings.Profiles.FirstOrDefault(o => o.Name == hostName);
+
+            try
+            { 
+
+                var connection = socket.Subscribe(rosMsgName, topic, parseData);
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+        }
 
 
         public async void Publish(string caller, string hostName, string topic, Message msg)
         {
-            if (!rosSocket.TryGetValue(hostName, out AutabeeRosSocket rosConnector))
+            if (!rosSocket.TryGetValue(hostName, out RosSocket socket))
             {
                 return;
             }
 
             try
             {
-                var (id, data) = rosConnector.Publish(topic, msg, true);
-                rosConnectors[hostName].Publish(topic, msg);
+                socket.Publish(topic, msg);
 
 
                 //var connection = rosConnector.Subscribe(topicTypes, _SubscriptionUpdate);
 
                 return;
+            }
+            catch (System.Collections.Generic.KeyNotFoundException _)
+            {
+                try
+                {
+                    socket.Advertise(msg.GetType(), topic);
+                    socket.Publish(topic, msg);
+                }
+                catch (Exception ex)
+                {
+                    return;
+                }
             }
             catch (Exception ex)
             {
@@ -89,10 +114,10 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
 
         }
 
-        private void _SubscriptionUpdate(string topic, Message data)
+        private void parseData(string topic, string data, string rosMsgType)
         {
-            Console.WriteLine($"Topic: {topic} Data: {data}");
-            SubscriptionUpdate?.Invoke(topic, data);
+            Console.WriteLine($"Topic: {topic}, Data: {data}, msg_type:{rosMsgType}");
+            SubscriptionUpdate?.Invoke(topic, data, rosMsgType);
         }
 
         public void Unsubscribe(string topic)

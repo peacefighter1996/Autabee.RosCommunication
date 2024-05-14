@@ -8,7 +8,6 @@
 @using RosSharp.RosBridgeClient
 @using std_msgs = RosSharp.RosBridgeClient.MessageTypes.Std
 @using System.Xml.Serialization
-@inject RosConnector rosConnector
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject ILogger<Diagnostics> Logger
@@ -137,13 +136,16 @@
             {
                 Console.WriteLine($"Publishing message {inputMessage}");
                 var message = new std_msgs.String { data = inputMessage };
-                var result = rosConnector.Publish("/subscription_test", message);
-                Console.WriteLine($"Publish result: {result}");
 
                 try
                 {
+                    var str = Newtonsoft.Json.JsonConvert.SerializeObject((Message)message,new JsonSerializerSettings(){
+                        ObjectCreationHandling = ObjectCreationHandling.Auto,
+                        TypeNameHandling = TypeNameHandling.All
+                    });
+                    Console.WriteLine(str);
                     Console.WriteLine("Sending message to SignalR");
-                    await hubConnection.SendAsync("Publish", "default", "/subscription_test");
+                    await hubConnection.SendAsync("Publish", "default", "/subscription_test", str );
 
                 }
                 catch (Exception ex)
@@ -202,12 +204,9 @@
                 .Build();
 
             await hubConnection.StartAsync();
-            // hubConnection.On<string, Message>("SubscriptionUpdate", (topic, message) =>
-            // {
-            //     Console.WriteLine($"Received message on {topic} with msg {message}");
-            // });
+            hubConnection.On<string, string, string>("SubscriptionUpdate", RecieveSubscriptionMessage);
             await hubConnection.SendAsync("Subscribe", "default", "/chatter");
-
+            await hubConnection.SendAsync("ActiveSubscribe", "default", "/subscription_test", std_msgs.String.RosMessageName);
         }
         catch (Exception ex)
         {
@@ -246,9 +245,8 @@
             Logger.LogInformation(ex.Message);
         }
 
-
-        var id = rosConnector.Subscribe<std_msgs.String>("/subscription_test",
-        (std_msgs.String s) => SubscriptionHandler("/subscription_test", s));
+        // var id = rosConnector.Subscribe<std_msgs.String>("/subscription_test",
+        // (std_msgs.String s) => SubscriptionHandler("/subscription_test", s));
     }
 
     private async void SubscriptionHandler(string topic, std_msgs.String message)
@@ -260,14 +258,17 @@
 
     private void Subscribe(RosTopic topic)
     {
-        Console.WriteLine($"Subscribing to {topic.Name}");
-        var id = rosConnector.Subscribe<std_msgs.String>(topic.Name, (std_msgs.String s) =>
-        {
-            Console.WriteLine($"Received message on {topic.Name}");
-            SubscriptionHandler(topic.Name, s);
-        });
-        Console.WriteLine($"Subscribed to {topic.Name} with id {id}");
+        hubConnection.On<string, string, string>("SubscriptionUpdate", RecieveSubscriptionMessage);
     }
+
+    private void RecieveSubscriptionMessage(string topic, string message,string rosMsgType) 
+    {
+        Console.WriteLine($"Received message on {topic} with msg [{rosMsgType}] {message}");
+        messages.Add((DateTime.Now, topic, message));
+        StateHasChanged();
+    }
+
+
 
     private void ShowNodeDetails(string node)
     {

@@ -29,9 +29,9 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
             }
         }
 
-        public void SubscriptionUpdate(string topic, Message message)
+        public void SubscriptionUpdate(string topic, string data, string rosMsgType)
         {
-            _hubContext.Clients.All.SendAsync(nameof(SubscriptionUpdate), topic, JsonConvert.SerializeObject(message));
+            _hubContext.Clients.All.SendAsync(nameof(SubscriptionUpdate), topic, data, rosMsgType);
         }
     }
 }
