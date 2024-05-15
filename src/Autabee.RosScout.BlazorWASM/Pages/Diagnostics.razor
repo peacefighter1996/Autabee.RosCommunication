@@ -16,7 +16,7 @@
 <PageTitle>Ros Scout Diagnostics</PageTitle>
 <div id="diagnostics-container">
     <div id="selected-master">
-        <MudSelect @bind-Value="activeProfile" Margin="Margin.Dense" T="string" Label="SelectedProfile" Variant="Variant.Text">
+        <MudSelect @bind-Value="ActiveProfile" Margin="Margin.Dense" T="string" Label="SelectedProfile" Variant="Variant.Text">
             @if (rosSettings == null)
             {
                 <MudSelectItem Value="@("default")">default</MudSelectItem>
@@ -184,7 +184,11 @@
     //List<RosService> services = new List<RosService>();
     RosSystem system;
     RosSettings rosSettings;
-    string activeProfile = "default";
+    string ActiveProfile { get => activeProfile; set
+        {
+            SelectProfileChanged(value);
+        } }
+    string activeProfile = "none";
     IEnumerable<string> nodes = new string[0];
     private HubConnection? hubConnection;
 
@@ -221,22 +225,39 @@
         }
         try
         {
-
             var tmp = await Http.GetFromJsonAsync<RosSettings>("/api/Robots/getRosSettings/");
-            
+
             if (tmp != null)
             {
                 Logger.LogInformation(JsonConvert.SerializeObject(tmp.Profiles));
                 rosSettings = tmp;
-                activeProfile = rosSettings.Profiles.First().Name;
+                SelectProfileChanged(rosSettings.Profiles.FirstOrDefault().Name);
             }
             else
             {
                 Logger.LogInformation("No settings found");
             }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogInformation(ex.Message);
+        }
+    }
 
-            
+    private async void SelectProfileChanged(string profile)
+    {
+        if (profile == activeProfile)
+        {
+            return;
+        }
 
+        //TODO: Unsubscripted from old topics
+
+        Logger.LogInformation($"Changing profile to {profile}");
+        activeProfile = profile;
+
+        try
+        {
             var result = await Http.GetFromJsonAsync<List<RosTopic>>("/api/RosMaster/getTopicTypes/rosapi");
             Logger.LogInformation(JsonConvert.SerializeObject(result));
             topics = result ?? new List<RosTopic>();
@@ -249,11 +270,11 @@
         }
         catch (Exception ex)
         {
-            Logger.LogInformation(ex.Message);
+            Logger.LogError(ex.Message);
         }
 
-        // var id = rosConnector.Subscribe<std_msgs.String>("/subscription_test",
-        // (std_msgs.String s) => SubscriptionHandler("/subscription_test", s));
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private async void SubscriptionHandler(string topic, std_msgs.String message)
