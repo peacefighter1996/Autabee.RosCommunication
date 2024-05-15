@@ -92,7 +92,7 @@ Following steps are needed to get the project up and running.
 ## To Do
 
 - [ ] Documentation for the project. Mostly in therms of architecture and how to use different parts of the project.
-- [ ] Get Subscription working through SignalR, currently the Web App connects directly to the ROS bridge, but this should not be the case as it comes with remote deployment issues when deployed in an inaccessible network. (Challenging)
+- [x] Get Subscription working through SignalR, currently the Web App connects directly to the ROS bridge, but this should not be the case as it comes with remote deployment issues when deployed in an inaccessible network. [15th may]
 - [ ] Develop Controls for the Web App to control the robot
   - [ ] Move control 
   - [ ] Ultra Sonic Sensor feed
@@ -100,8 +100,8 @@ Following steps are needed to get the project up and running.
   - [ ] Arm/Gripper control
   - [ ] Map view (Challenging)
 - [ ] Develop ID Node to be launched on robot for dynamic page acquisition. So that the Web App can be used for any robot. 
-- [ ] Retrieve specifics about active services for dynamic control creation and validation of system
-- [ ] Authentication and Authorization for the Web API (Challenging)
+- [ ] Retrieve specifics about active services for dynamic control creation and validation of system.
+- [ ] Authentication and Authorization for the Web API. (Challenging)
 
 ## Contributors
 
