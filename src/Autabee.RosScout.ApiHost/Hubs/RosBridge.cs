@@ -10,13 +10,24 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
         readonly Dictionary<string, RosSocket> rosSocket = new Dictionary<string, RosSocket>();
         public event Action<string, string, string> SubscriptionUpdate;
 
+        public List<string> DisconnectedSockets = new List<string>();
+
         public RosBridge(RosSettings rosSettings)
         {
             this.rosSettings = rosSettings;
             this.rosSocket = new Dictionary<string, RosSocket>();
             foreach (var item in this.rosSettings.Profiles)
             {
-                var bridge = new RosSocket(new RosSharp.RosBridgeClient.Protocols.WebSocketNetProtocol(item.Bridge), true);
+                var bridge = new RosSocket(new RosSharp.RosBridgeClient.Protocols.WebSocketNetProtocol(item.Bridge), false);
+
+                bridge.protocol.OnClosed += 
+                    (sender, e) => DisconnectedSockets.Add(item.Name);
+                bridge.protocol.OnConnected += 
+                    (sender, e) => DisconnectedSockets.Remove(item.Name);
+
+                DisconnectedSockets.Add(item.Name);
+
+
                 rosSocket.Add(item.Name, bridge);
             }
         }
@@ -122,6 +133,10 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
 
         public void Unsubscribe(string topic)
         {
+        }
+        public void Connect(string item)
+        {
+            rosSocket[item].Connect();
         }
     }
 }

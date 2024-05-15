@@ -26,6 +26,11 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
             while (!stoppingToken.IsCancellationRequested)
             {
                 await Task.Delay(1000, stoppingToken);
+                // Reconnection logic
+                foreach (var item in _rosBridge.DisconnectedSockets)
+                {
+                    _rosBridge.Connect(item);
+                }
             }
         }
 
