@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autabee.RosScout.ApiHost", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autabee.Communication.RosClient", "Autabee.Communication.RosClient\Autabee.Communication.RosClient.csproj", "{6DD4376A-E57D-440B-A775-BDD12AA6BDE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autabee.RosScout.Components", "Autabee.RosScout.Components\Autabee.RosScout.Components.csproj", "{10B46585-122F-40D6-B58E-9DC6FE5C9C7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autabee.RosScout.Components", "Autabee.RosScout.Components\Autabee.RosScout.Components.csproj", "{10B46585-122F-40D6-B58E-9DC6FE5C9C7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
