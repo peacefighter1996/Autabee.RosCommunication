@@ -47,7 +47,9 @@
                         <tr>
                             <td>@topic.Name</td>
                             <td>@topic.Type</td>
-                            <td><button @onclick="()=>Subscribe(topic)" title="subscribe" class="mdi mdi-rss-box" /></td>
+                            <td><button @onclick="()=>Subscribe(topic)" title="subscribe" class="mdi mdi-rss-box" />
+                                <button @onclick="()=>ShowTopicDetails(topic)" title="details" class="mdi mdi-magnify" />
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -104,9 +106,13 @@
     <div class="Viewport" id="diag-details">
         <h3>Details</h3>
         <div class="InnerItem">
-            @if (activeDetails == ActiveDetails.Node)
+            @if (activeDetail == ActiveDetail.Node)
             {
-                <NodeDetailView activeNodeDetails="@activeNodeDetails" system="@system" topics="@topics"/>
+                <NodeDetailView activeNode="@((string)activeDetailObject)" system="@system" topics="@topics" />
+            }
+            else if (activeDetail == ActiveDetail.Topic)
+            {
+                <TopicDetailView activeTopic="@((RosTopic)activeDetailObject)" system="@system"/>
             }
             else
             {
@@ -182,7 +188,8 @@
     IEnumerable<string> nodes = new string[0];
     private HubConnection? hubConnection;
 
-    enum ActiveDetails
+
+    enum ActiveDetail
     {
         None,
         Topic,
@@ -190,8 +197,8 @@
         Node,
         Services,
     }
-    ActiveDetails activeDetails = ActiveDetails.None;
-    string activeNodeDetails = "";
+    ActiveDetail activeDetail = ActiveDetail.None;
+    object activeDetailObject = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -272,9 +279,19 @@
 
     private void ShowNodeDetails(string node)
     {
-        activeDetails = ActiveDetails.Node;
-        activeNodeDetails = node;
+        activeDetail = ActiveDetail.Node;
+        activeDetailObject = node;
 
+        Logger.LogInformation($"Showing topic details for {activeDetailObject} {activeDetail}");
+        StateHasChanged();
+    }
+
+    private void ShowTopicDetails(RosTopic topic)
+    {
+        activeDetail = ActiveDetail.Topic;
+        activeDetailObject = topic;
+
+        Logger.LogInformation($"Showing topic details for {activeDetailObject} {activeDetail}");
         StateHasChanged();
     }
 }

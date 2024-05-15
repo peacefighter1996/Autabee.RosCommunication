@@ -9,12 +9,12 @@
     </thead>
     <tbody>
         <tr><td>Details of:</td><td>Node</td></tr>
-        <tr><td>Name:</td><td>@activeNodeDetails</td></tr>
+        <tr><td>Name:</td><td>@activeNode</td></tr>
     </tbody>
 
 
-@if (system.subscribers.Any(o => o.nodes.Contains(activeNodeDetails)))
-{
+    @if (system.subscribers.Any(o => o.nodes.Contains(activeNode)))
+    {
         <thead>
             <tr>
                 <th>Topic Subscription</th>
@@ -22,7 +22,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var topic in system.subscribers.Where(o => o.nodes.Contains(activeNodeDetails)))
+            @foreach (var topic in system.subscribers.Where(o => o.nodes.Contains(activeNode)))
             {
                 <tr>
                     <td>@topic.Name</td>
@@ -31,18 +31,18 @@
             }
 
         </tbody>
-}
-else
-{
+    }
+    else
+    {
         <thead>
             <tr>
                 <th colspan="2">No Subscriptions</th>
             </tr>
         </thead>
-}
+    }
 
-@if (system.publishers.Any(o => o.nodes.Contains(activeNodeDetails)))
-{
+    @if (system.publishers.Any(o => o.nodes.Contains(activeNode)))
+    {
         <thead>
             <tr>
                 <th>Topic Publisher</th>
@@ -50,7 +50,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var topic in system.publishers.Where(o => o.nodes.Contains(activeNodeDetails)).Select(o => topics.FirstOrDefault(k => k.Name == o.Name)).Where(o => o != null))
+            @foreach (var topic in system.publishers.Where(o => o.nodes.Contains(activeNode)).Select(o => topics.FirstOrDefault(k => k.Name == o.Name)).Where(o => o != null))
             {
                 <tr>
                     <td>@topic.Name</td>
@@ -60,18 +60,18 @@ else
 
         </tbody>
 
-}
-else
-{
+    }
+    else
+    {
         <thead>
             <tr>
                 <th colspan="2">No Publishers</th>
             </tr>
         </thead>
-}
+    }
 
-@if (system.services.Any(o => o.nodes.Contains(activeNodeDetails)))
-{
+    @if (system.services.Any(o => o.nodes.Contains(activeNode)))
+    {
 
         <thead>
             <tr>
@@ -79,7 +79,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var service in system.publishers.Where(o => o.nodes.Contains(activeNodeDetails)))
+            @foreach (var service in system.publishers.Where(o => o.nodes.Contains(activeNode)))
             {
                 <tr>
                     <td colspan="2">@service.Name</td>
@@ -87,19 +87,20 @@ else
             }
 
         </tbody>
-}
-else
-{
+    }
+    else
+    {
         <thead>
             <tr>
                 <th colspan="2">No Services</th>
             </tr>
         </thead>
-}
+    }
 </table>
-@code{
+
+@code {
     [Parameter]
-    public string activeNodeDetails { get; set; } = string.Empty;
+    public string activeNode { get; set; } = string.Empty;
 
     [Parameter]
     public List<RosTopic> topics { get; set; } = new List<RosTopic>();
@@ -107,6 +108,3 @@ else
     [Parameter]
     public RosSystem system { get; set; }
 }
-
-
-

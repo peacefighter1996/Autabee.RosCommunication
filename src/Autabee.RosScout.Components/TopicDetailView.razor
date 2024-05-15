@@ -1,0 +1,75 @@
+﻿@using Autabee.Communication.RosClient.Dto
+
+
+<table class="datatable" style="width: 100%;">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Details of:</td><td>Topic</td></tr>
+        <tr><td>Name:</td><td>@activeTopic.Name</td></tr>
+        <tr><td>Message Type:</td><td>@activeTopic.Type</td></tr>
+    </tbody>
+
+    @if (system.subscribers.Any(o => o.Name == activeTopic.Name))
+    {
+        <thead>
+            <tr>
+                <th colspan="2">Subscribers</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var topic in system.publishers.First(o => o.Name == activeTopic.Name).nodes)
+            {
+                <tr>
+                    <td>@topic</td>
+                </tr>
+            }
+        </tbody>
+    }
+    else
+    {
+        <thead>
+            <tr>
+                <th colspan="2">No Subscribers</th>
+            </tr>
+        </thead>
+    }
+
+    @if (system.publishers.Any(o => o.Name == activeTopic.Name))
+    {
+        <thead>
+            <tr>
+                <th colspan="2">Publishers</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var topic in system.publishers.First(o => o.Name == activeTopic.Name).nodes)
+            {
+                <tr>
+                    <td>@topic</td>
+                </tr>
+            }
+        </tbody>
+
+    }
+    else
+    {
+        <thead>
+            <tr>
+                <th colspan="2">No Publishers</th>
+            </tr>
+        </thead>
+    }
+</table>
+
+@code {
+    [Parameter]
+    public RosTopic activeTopic { get; set; }
+
+    [Parameter]
+    public RosSystem system { get; set; }
+}
