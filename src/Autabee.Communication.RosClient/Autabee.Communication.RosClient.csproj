@@ -7,6 +7,6 @@
   </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Autabee.Utility.Messaging.Validation" Version="1.0.0" />
-        <PackageReference Include="Autabee.Rosbridge.Client" Version="1.9.0" />
+        <PackageReference Include="Autabee.Rosbridge.Client" Version="1.9.2" />
         </ItemGroup>
 </Project>

@@ -1,17 +1,17 @@
 
 #diagnostics-container {
     grid-template-areas:
-      'selected-master diag-subscription diag-subscription diag-subscription'
-      'diag-topic      diag-subscription diag-subscription diag-subscription'
-      'diag-topic diag-subscription diag-subscription diag-subscription'
-      'diag-node diag-details diag-publish diag-log'
-      'diag-node diag-details diag-publish diag-log';
+        'selected-master diag-subscription diag-subscription diag-subscription'
+        'diag-topic      diag-subscription diag-subscription diag-subscription'
+        'diag-topic diag-subscription diag-subscription diag-subscription'
+        'diag-node diag-details diag-publish diag-log'
+        'diag-node diag-details diag-publish diag-log';
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: 60px 1fr 1fr 1fr 1fr;
+    grid-template-rows: 80px 1fr 1fr 1fr 1fr;
     display: grid;
     height: 100vh;
-  } 
-
+    max-height: 100%;
+}
   #selected-master {
     grid-area: selected-master;
   }
@@ -21,6 +21,36 @@
   #diag-topic {
     grid-area: diag-topic;
   }
+
+  #diag-topic table {
+      table-layout: fixed;
+      width: 100%;
+      overflow: auto;
+  }
+
+    #diag-topic td {
+        overflow: hidden;
+        padding: 0px 4px 0px 4px;
+    }
+
+    #diag-topic tr:nth-child(3) {
+        width: 50px;
+        padding: 0px 0px 0px 0px;
+        
+    }
+    #diag-topic th:nth-child(3) {
+        width: 50px;
+        padding: 0px 0px 0px 0px;
+    }
+
+    #diag-topic table thead tr th {
+        /* you could also change td instead th depending your html code */
+        position: sticky;
+        z-index: 100;
+
+        top: 0;
+    }
+
   #diag-node {
     grid-area: diag-node;
   }
@@ -31,9 +61,40 @@
     grid-area: diag-publish;
   }
   #diag-log {
+
     grid-area: diag-log;
   }
 
+  #diag-log > div {
+    display: flex;
+    flex-direction: column;
+    overflow-x: clip;
+
+    overflow-y: auto;
+  }
+
+
+.InnerItem {
+    flex: 1;
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.Viewport {
+    display: flex;
+    max-height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.Viewport > h3 {
+    padding: 5px;
+    padding-left: 1em;
+    margin: 0px;
+/*    font-weight: 700;
+    font-size: 12px;*/
+}
   /*tr:nth-child(even) {
       background-color: azure
   }*/
@@ -43,4 +104,37 @@
     float: right;
     padding: 0px 1px 0px 1px;
     width: 20px;
+}
+
+
+.logitem {
+    padding: 0px 0px 0px 1em;
+    display: flex;
+    flex-direction: row;
+}
+
+.logitem > span {
+    margin: 1px 5px;
+    display: block;
+}
+
+.logitem > button {
+    flex: 1;
+    max-height: 100%;
+    border: none;
+    }
+
+.log-message-short {
+    flex: 50;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 16px;
+    white-space: nowrap;
+}
+
+.log-message {
+    flex: 50;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
 }

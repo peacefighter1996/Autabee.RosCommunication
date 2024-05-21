@@ -1,4 +1,6 @@
 ﻿@using Autabee.Communication.RosClient.Dto
+@using Microsoft.Extensions.Logging
+@inject ILogger<NodeDetailView> Logger
 
 <table class="datatable" style="width: 100%;">
     <thead>
@@ -107,4 +109,30 @@
 
     [Parameter]
     public RosSystem system { get; set; }
+
+
+    // protected override Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     Logger.LogInformation("NodeDetailView:OnAfterRenderAsync");
+
+
+    //     Logger.LogInformation("{}", activeNode);
+
+    //     foreach (var item in system.publishers)
+    //     {
+    //         string nodes = String.Join(",", item.nodes);
+
+    //         foreach (var node in item.nodes)
+    //         {
+    //             Logger.LogInformation("{},{},{}", activeNode, node, activeNode == node);
+    //         }
+    //         Logger.LogInformation("{} {}", nodes, item.nodes.Where(o => o == activeNode).Count() > 0);
+    //     }
+
+    //     Logger.LogInformation("{} {}", activeNode, system.publishers.Where(o => o.nodes
+    //         .Where(o => o== activeNode).Count() > 0).Count());
+
+
+    //     return base.OnAfterRenderAsync(firstRender);
+    // }
 }

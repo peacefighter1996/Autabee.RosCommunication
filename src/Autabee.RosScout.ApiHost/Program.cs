@@ -1,4 +1,5 @@
 using Autabee.Communication.RosClient;
+using Autabee.RosScout.BlazorWASM;
 using Autabee.RosScout.WasmHostApi.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
@@ -37,9 +38,11 @@ namespace Autabee.WasmHostApi
             });
 
             builder.Services.AddSignalR();
-            builder.Services.AddHostedService<RosService>();
+            // setting up proxy service
+            builder.Services.AddHostedService<RosBridgeService>();
             builder.Services.AddTransient<RosBridgeHub>();
             builder.Services.AddSingleton<RosBridge>();
+
             builder.Configuration.AddConfiguration(appConfig);
             builder.Configuration.AddConfiguration(rosConfig);
             builder.Services.AddTransient(s => rosConfig.Get<RosSettings>());
@@ -71,14 +74,9 @@ namespace Autabee.WasmHostApi
 
             app.UseAuthorization();
             app.MapRazorPages();
-
-
             app.MapControllers();
-            
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapHub<RosBridgeHub>("/rosbridgehub");
-            });
+
+            app.MapHub<RosBridgeHub>("/rosbridgehub");
 
 
             app.Run();

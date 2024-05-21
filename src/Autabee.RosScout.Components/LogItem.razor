@@ -1,0 +1,20 @@
+﻿<div class="logitem logitem-@item.message.Level.ToString()">
+    <span class="logitemtime">[@item.message.Timestamp.TimeOfDay.ToString("hh':'mm':'ss") @item.message.Level.ToString()]</span>
+    <span class=@item.MessageClass>@item.message.RenderMessage()</span>
+@*     @if (item.MultiLine || item.message.RenderMessage().Length > 80)
+    {
+        @if (item.ShowFullMessage)
+        {
+            <button @onclick="()=>item.ShowFullMessage=false"><icon class="mdi mdi-eye" /></button>
+        }
+        else
+        {
+            <button @onclick="()=>item.ShowFullMessage=true"><icon class="mdi mdi-eye-off" /></button>
+        }
+
+    } *@
+</div>
+@code {
+    [Parameter]
+    public LogMessage item { get; set; }
+}

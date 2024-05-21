@@ -20,13 +20,13 @@ namespace Autabee.WasmHostApi.Controllers
         public Task<IActionResult> GetTopicTypes()
             => GetTopicTypes("wa_host", "http://localhost:11311/");
         [HttpPost("getTopicTypes/")]
-        public Task<IActionResult> GetTopicTypes_Host(string host)
+        public Task<IActionResult> GetTopicTypes_Host([FromBody] string host)
             => GetTopicTypes("wa_host", host);
         [HttpGet("getTopicTypes/{callerId}")]
         public Task<IActionResult> GetTopicTypes(string callerId)
             => GetTopicTypes(callerId, "http://localhost:11311/");
         [HttpPost("getTopicTypes/{callerId}")]
-        public async Task<IActionResult> GetTopicTypes(string callerId, string host)
+        public async Task<IActionResult> GetTopicTypes(string callerId, [FromBody] string host)
         {
             try
             {
@@ -46,13 +46,13 @@ namespace Autabee.WasmHostApi.Controllers
         public Task<IActionResult> lookupNode(string node)
             => lookupNode("wa_host", node, "http://localhost:11311/");
         [HttpPost("lookupNode/{node}")]
-        public Task<IActionResult> lookupNode_Host(string node, string host)
+        public Task<IActionResult> lookupNode_Host(string node, [FromBody] string host)
             => lookupNode("wa_host", node, host);
         [HttpGet("lookupNode/{callerId}/{node}")]
         public Task<IActionResult> lookupNode(string callerId, string node)
             => lookupNode(callerId, node, "http://localhost:11311/");
         [HttpPost("lookupNode/{callerId}/{node}")]
-        public async Task<IActionResult> lookupNode(string callerId, string node, string host)
+        public async Task<IActionResult> lookupNode(string callerId, string node, [FromBody] string host)
         {
             node = Regex.Replace(node, @"%2F", "/");
             var result = await CallExecutor.Execute(host, () => CallBuilder.LookupNode(callerId, node), ResponseParser.LookupNode );
@@ -65,13 +65,13 @@ namespace Autabee.WasmHostApi.Controllers
         public Task<IActionResult> lookupService(string service)
             => lookupService("wa_host", service, "http://localhost:11311/");
         [HttpPost("lookupService/{service}")]
-        public Task<IActionResult> lookupService_Host(string service, string host)
+        public Task<IActionResult> lookupService_Host(string service, [FromBody] string host)
             => lookupService("wa_host", service, host);
         [HttpGet("lookupService/{callerId}/{service}")]
         public Task<IActionResult> lookupService(string callerId, string service)
             => lookupService(callerId, service, "http://localhost:11311/");
         [HttpPost("lookupService/{callerId}/{service}")]
-        public async Task<IActionResult> lookupService(string callerId, string service, string host)
+        public async Task<IActionResult> lookupService(string callerId, string service, [FromBody] string host)
         {
             service = Regex.Replace(service, @"%2F", "/");
             try
@@ -92,13 +92,13 @@ namespace Autabee.WasmHostApi.Controllers
         public Task<IActionResult> getSystemState()
             => getSystemState("wa_host", "http://localhost:11311/");
         [HttpPost("getSystemState/")]
-        public Task<IActionResult> getSystemState_Host(string host)
+        public Task<IActionResult> getSystemState_Host([FromBody] string host)
             => getSystemState("wa_host", host);
         [HttpGet("getSystemState/{callerId}")]
         public Task<IActionResult> getSystemState(string callerId)
             => getSystemState(callerId, "http://localhost:11311/");
         [HttpPost("getSystemState/{callerId}")]
-        public async Task<IActionResult> getSystemState(string callerId, string host)
+        public async Task<IActionResult> getSystemState(string callerId, [FromBody] string host)
         {
             try
             {
@@ -119,13 +119,13 @@ namespace Autabee.WasmHostApi.Controllers
         public Task<IActionResult> getUri()
             => getUri("wa_host", "http://localhost:11311/");
         [HttpPost("getUri/")]
-        public Task<IActionResult> getUri_Host(string host)
+        public Task<IActionResult> getUri_Host([FromBody] string host)
             => getUri("wa_host", host);
         [HttpGet("getUri/{callerId}")]
         public Task<IActionResult> getUri(string callerId)
             => getUri(callerId, "http://localhost:11311/");
         [HttpPost("getUri/{callerId}")]
-        public async Task<IActionResult> getUri(string callerId, string host)
+        public async Task<IActionResult> getUri(string callerId, [FromBody] string host)
         {
             try
             {
@@ -146,7 +146,7 @@ namespace Autabee.WasmHostApi.Controllers
             => getPublishedTopics("wa_host", "http://localhost:11311/", "");
 
         [HttpPost("getPublishedTopics/")]
-        public Task<IActionResult> getPublishedTopics_Host(string host)
+        public Task<IActionResult> getPublishedTopics_Host([FromBody] string host)
             => getPublishedTopics("wa_host", host, "");
 
         [HttpGet("getPublishedTopics/{callerId}")]
@@ -154,7 +154,7 @@ namespace Autabee.WasmHostApi.Controllers
             => getPublishedTopics(callerId, "http://localhost:11311/", "");
 
         [HttpPost("getPublishedTopics/{callerId}")]
-        public async Task<IActionResult> getPublishedTopics(string callerId, string host, string subgraph)
+        public async Task<IActionResult> getPublishedTopics(string callerId, [FromBody] string host, string subgraph)
         {
             try
             {

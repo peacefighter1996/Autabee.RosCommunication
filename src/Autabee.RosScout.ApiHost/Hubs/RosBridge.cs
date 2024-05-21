@@ -1,14 +1,23 @@
 ﻿using Autabee.Communication.RosClient;
 using RosSharp.RosBridgeClient;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Autabee.RosScout.WasmHostApi.Hubs
 {
-    public class RosBridge
+    
+
+
+
+    public class RosBridge : IRosBridge
     {
         readonly RosSettings rosSettings;
 
+        public List<string> logs = new List<string>();
+
         readonly Dictionary<string, RosSocket> rosSocket = new Dictionary<string, RosSocket>();
-        public event Action<string, string, string> SubscriptionUpdate;
+        public event RosBridgeSubscriptionHandler SubscriptionMsgUpdate;
 
         public List<string> DisconnectedSockets = new List<string>();
 
@@ -32,60 +41,60 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
             }
         }
 
-        public async void Subscribe(string caller,string hostName, string topic)
+        public async Task<string> Subscribe(string profile, string topic)
         {
-            if (!rosSocket.TryGetValue(hostName, out RosSocket socket))
+            if (!rosSocket.TryGetValue(profile, out RosSocket socket))
             {
-                return;
+                return string.Empty;
             }
 
-            var host = rosSettings.Profiles.FirstOrDefault(o => o.Name == hostName);
+            var host = rosSettings.Profiles.FirstOrDefault(o => o.Name == profile);
 
             try
             {
+                // check if topic exist
                 var result = await CallExecutor.Execute(host.Master,
-                                       () => CallBuilder.GetTopicTypes(caller),
+                                       () => CallBuilder.GetTopicTypes("autabee_api"),
                                                           ResponseParser.GetTopics);
                 if (!result.Success)
                 {
-                    return;
+                    return string.Empty;
                 }
 
-                var topicTypes = result.Object.FirstOrDefault(o => o.Name == topic);
-                if (topicTypes == null)
+                var topicDetail = result.Object.FirstOrDefault(o => o.Name == topic);
+                if (topicDetail == null)
                 {
-                    return;
+                    return string.Empty;
                 }
 
-                var connection = socket.Subscribe(topicTypes.Type, topic, parseData);
+                var connection = socket.AddSubscription(topic, (string id) => new RosBridgeSubscription(topicDetail.Type, id, topicDetail.Name, profile, parseData, throttle_rate:1, queue_length:1));
 
-                return;
+                return connection;
             }
             catch (Exception ex)
             {
-                return;
+                return ex.Message;  
             }
 
         }
-        public void Subscribe(string? caller, string hostName, string topic, string rosMsgName)
+        public string Subscribe(string profile, string topic, string rosMsgName)
         {
-            if (!rosSocket.TryGetValue(hostName, out RosSocket socket))
+            if (!rosSocket.TryGetValue(profile, out RosSocket socket))
             {
-                return;
+                return string.Empty;
             }
 
-            var host = rosSettings.Profiles.FirstOrDefault(o => o.Name == hostName);
+            var host = rosSettings.Profiles.FirstOrDefault(o => o.Name == profile);
 
             try
             { 
+                var connection = socket.AddSubscription(topic, (string id) => new RosBridgeSubscription(rosMsgName,  id, topic, profile, parseData, throttle_rate: 1, queue_length: 1));
 
-                var connection = socket.Subscribe(rosMsgName, topic, parseData);
-
-                return;
+                return connection;
             }
             catch (Exception ex)
             {
-                return;
+                return ex.Message;
             }
         }
 
@@ -100,10 +109,6 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
             try
             {
                 socket.Publish(topic, msg);
-
-
-                //var connection = rosConnector.Subscribe(topicTypes, _SubscriptionUpdate);
-
                 return;
             }
             catch (System.Collections.Generic.KeyNotFoundException _)
@@ -124,15 +129,20 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
             }
 
         }
-
-        private void parseData(string topic, string data, string rosMsgType)
+        private void parseData(SubscriptionValueRecord msg)
         {
-            Console.WriteLine($"Topic: {topic}, Data: {data}, msg_type:{rosMsgType}");
-            SubscriptionUpdate?.Invoke(topic, data, rosMsgType);
+            SubscriptionMsgUpdate?.Invoke(msg);
         }
 
-        public void Unsubscribe(string topic)
+        public void Unsubscribe(string hostName, string topic)
         {
+            if (!rosSocket.TryGetValue(hostName, out RosSocket socket))
+            {
+                return;
+            }
+
+            socket.Unsubscribe(topic);
+
         }
         public void Connect(string item)
         {

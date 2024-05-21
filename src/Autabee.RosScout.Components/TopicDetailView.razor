@@ -25,7 +25,7 @@
             @foreach (var topic in system.publishers.First(o => o.Name == activeTopic.Name).nodes)
             {
                 <tr>
-                    <td>@topic</td>
+                    <td colspan="2">@topic</td>
                 </tr>
             }
         </tbody>
@@ -50,7 +50,7 @@
             @foreach (var topic in system.publishers.First(o => o.Name == activeTopic.Name).nodes)
             {
                 <tr>
-                    <td>@topic</td>
+                    <td colspan="2">@topic</td>
                 </tr>
             }
         </tbody>

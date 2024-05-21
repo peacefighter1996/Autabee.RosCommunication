@@ -4,13 +4,13 @@
       "Version": "Noetic",
       "Bridge": "ws://localhost:9090",
       "Master": "http://localhost:11311",
-      "Name": "TerraDiscovery1"
+      "Name": "default"
     },
     {
       "Version": "Noetic",
-      "Bridge": "ws://localhost:9090",
-      "Master": "http://localhost:11311",
-      "Name": "default"
+      "Bridge": "ws://192.168.241.251:9090",
+      "Master": "http://192.168.241.251:11311",
+      "Name": "TerraDiscovery1"
     }
   ]
 }

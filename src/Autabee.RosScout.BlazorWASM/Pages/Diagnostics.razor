@@ -11,11 +11,12 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject ILogger<Diagnostics> Logger
+@inject InMemoryLog log;
 
 
 <PageTitle>Ros Scout Diagnostics</PageTitle>
 <div id="diagnostics-container">
-    <div id="selected-master">
+    <div id="selected-master" style="padding-left:5px">
         <MudSelect @bind-Value="ActiveProfile" Margin="Margin.Dense" T="string" Label="SelectedProfile" Variant="Variant.Text">
             @if (rosSettings == null)
             {
@@ -29,10 +30,15 @@
                 }
             }
         </MudSelect>
+        <button @onclick="ScanSystemData" title="rescan system" class="mdi mdi-reload" />
     </div>
     <div class="Viewport" id="diag-topic">
-        <h3>Topic</h3>
-        <div class="InnerItem">
+        @* <div class="Viewportheader"> *@
+            <h3>Topic</h3>
+            
+        @* </div> *@
+        
+        <div class="InnerItem" style="width:100%">
             <table class="datatable" style="width: 100%;">
                 <thead>
                     <tr>
@@ -47,7 +53,8 @@
                         <tr>
                             <td>@topic.Name</td>
                             <td>@topic.Type</td>
-                            <td><button @onclick="()=>Subscribe(topic)" title="subscribe" class="mdi mdi-rss-box" />
+                            <td>
+                                <button @onclick="()=>Subscribe(topic)" title="subscribe" class="mdi mdi-rss-box" />
                                 <button @onclick="()=>ShowTopicDetails(topic)" title="details" class="mdi mdi-magnify" />
                             </td>
                         </tr>
@@ -62,18 +69,24 @@
             <table class="datatable" style="width: 100%;">
                 <thead>
                     <tr>
+                        <th>Id</th>
+                        <th>Profile</th>
                         <th>Time</th>
-                        <th>Topic</th>
                         <th>Data</th>
+                        <th>Type</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var message in messages.TakeLast(10).Reverse())
+                    @foreach (var message in values.TakeLast(10).Reverse())
                     {
                         <tr>
-                            <td>@message.Item1</td>
-                            <td>@message.Item2</td>
-                            <td>@message.Item3</td>
+                            <td>@message.Key</td>
+                            <td>@message.Value.Item2.Profile</td>
+                            <td>@message.Value.Item1</td>
+                            <td>@message.Value.Item2.Data</td>
+                            <td>@message.Value.Item2.RosName</td>
+                            <td><button @onclick="()=>UnSubscribe(message.Value.Item2.Profile, message.Key)" title="unSubscribe" class="mdi mdi-close" /></td>
                         </tr>
                     }
                 </tbody>
@@ -108,11 +121,11 @@
         <div class="InnerItem">
             @if (activeDetail == ActiveDetail.Node)
             {
-                <NodeDetailView activeNode="@((string)activeDetailObject)" system="@system" topics="@topics" />
+                <NodeDetailView activeNode="@activeNode" system="@system" topics="@topics" />
             }
             else if (activeDetail == ActiveDetail.Topic)
             {
-                <TopicDetailView activeTopic="@((RosTopic)activeDetailObject)" system="@system"/>
+                <TopicDetailView activeTopic="@activeTopic" system="@system" />
             }
             else
             {
@@ -145,13 +158,14 @@
 
                 try
                 {
-                    var str = Newtonsoft.Json.JsonConvert.SerializeObject((Message)message,new JsonSerializerSettings(){
-                        ObjectCreationHandling = ObjectCreationHandling.Auto,
-                        TypeNameHandling = TypeNameHandling.All
-                    });
+                    var str = Newtonsoft.Json.JsonConvert.SerializeObject((Message)message, new JsonSerializerSettings()
+                {
+                    ObjectCreationHandling = ObjectCreationHandling.Auto,
+                    TypeNameHandling = TypeNameHandling.All
+                });
                     Console.WriteLine(str);
                     Console.WriteLine("Sending message to SignalR");
-                    await hubConnection.SendAsync("Publish", "default", "/subscription_test", str );
+                    await hubConnection.SendAsync("Publish", "default", "/subscription_test", str);
 
                 }
                 catch (Exception ex)
@@ -173,24 +187,32 @@
     <div class="Viewport" id="diag-log">
         <h3>Log</h3>
         <div class="InnerItem">
+            @foreach (var item in log.Messages.AsEnumerable().Reverse())
+            {
+                <LogItem item="@item" />
+            }
         </div>
     </div>
 </div>
 
 
 @code {
-    List<(DateTime, string, string)> messages = new List<(DateTime, string, string)>();
     List<RosTopic> topics = new List<RosTopic>();
     //List<RosService> services = new List<RosService>();
     RosSystem system;
     RosSettings rosSettings;
-    string ActiveProfile { get => activeProfile; set
+    string ActiveProfile
+    {
+        get => activeProfile; set
         {
             SelectProfileChanged(value);
-        } }
+        }
+    }
     string activeProfile = "none";
     IEnumerable<string> nodes = new string[0];
     private HubConnection? hubConnection;
+
+    private Dictionary<string, (DateTime, SubscriptionValueRecord)> values = new ();
 
 
     enum ActiveDetail
@@ -202,7 +224,8 @@
         Services,
     }
     ActiveDetail activeDetail = ActiveDetail.None;
-    object activeDetailObject = null;
+    string activeNode = "";
+    RosTopic activeTopic = new RosTopic("", "");
 
     protected override async Task OnInitializedAsync()
     {
@@ -215,9 +238,10 @@
                 .Build();
 
             await hubConnection.StartAsync();
-            hubConnection.On<string, string, string>("SubscriptionUpdate", RecieveSubscriptionMessage);
-            await hubConnection.SendAsync("Subscribe", "default", "/chatter");
-            await hubConnection.SendAsync("ActiveSubscribe", "default", "/subscription_test", std_msgs.String.RosMessageName);
+            // hubConnection.On<string, string, string>("SubscriptionUpdate", RecieveSubscriptionMessage);
+            hubConnection.On<SubscriptionValueRecord>(nameof(IRosBridge.SubscriptionMsgUpdate), RecieveSubscriptionValueRecord);
+            // await hubConnection.SendAsync("Subscribe", "default", "/chatter");
+            // await hubConnection.SendAsync("ActiveSubscribe", "default", "/subscription_test", std_msgs.String.RosMessageName);
         }
         catch (Exception ex)
         {
@@ -256,15 +280,42 @@
         Logger.LogInformation($"Changing profile to {profile}");
         activeProfile = profile;
 
+        ScanSystemData(profile);
+    }
+
+    private void ScanSystemData() => ScanSystemData(activeProfile);
+
+    private async void ScanSystemData(string profile)
+    {
         try
         {
-            var result = await Http.GetFromJsonAsync<List<RosTopic>>("/api/RosMaster/getTopicTypes/rosapi");
+            RosProfile rosProfile = rosSettings.Profiles.FirstOrDefault(o => o.Name == profile);
+            if (rosProfile == null)
+            {
+                Logger.LogInformation("Profile not found");
+                return;
+            }
+
+            var postBody = rosProfile.Master;
+
+
+
+            var http = await Http.PostAsJsonAsync("/api/RosMaster/getTopicTypes/rosScout", postBody);
+            if (http.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Logger.LogError($"Error getting topics {http.StatusCode}");
+                return;
+            }
+
+            var result = await http.Content.ReadFromJsonAsync<List<RosTopic>>();
+
             Logger.LogInformation(JsonConvert.SerializeObject(result));
             topics = result ?? new List<RosTopic>();
 
             Logger.LogInformation("Getting system");
 
-            system = await Http.GetFromJsonAsync<RosSystem>("/api/RosMaster/getSystemState/rosapi");
+            http = await Http.PostAsJsonAsync("/api/RosMaster/getSystemState/rosScout", postBody);
+            system = await http.Content.ReadFromJsonAsync<RosSystem>();
             Logger.LogInformation(system.ToString());
             nodes = system.GetNodes();
         }
@@ -272,47 +323,80 @@
         {
             Logger.LogError(ex.Message);
         }
-
-
         await InvokeAsync(StateHasChanged);
     }
 
-    private async void SubscriptionHandler(string topic, std_msgs.String message)
+    // private async void SubscriptionHandler(string topic, std_msgs.String message)
+    // {
+    //     var json = Newtonsoft.Json.JsonConvert.SerializeObject(message);
+    //     messages.Add((DateTime.Now, topic, json));
+    //     await InvokeAsync(StateHasChanged);
+    // }
+
+
+
+
+    private async void Subscribe(RosTopic topic)
     {
-        var json = Newtonsoft.Json.JsonConvert.SerializeObject(message);
-        messages.Add((DateTime.Now, topic, json));
-        await InvokeAsync(StateHasChanged);
+        var value = await hubConnection.InvokeAsync<string>("Subscribe", activeProfile, topic.Name);
+        if (!string.IsNullOrEmpty(value) && value.StartsWith("/"))
+        {
+            var emptyRecord = new SubscriptionValueRecord(value, topic.Name, activeProfile, topic.Type, string.Empty);
+            values.Add(value, new(DateTime.MinValue, emptyRecord));
+            StateHasChanged();
+        }
+
     }
 
-    private void Subscribe(RosTopic topic)
-    {
-        hubConnection.On<string, string, string>("SubscriptionUpdate", RecieveSubscriptionMessage);
-    }
 
-    private void RecieveSubscriptionMessage(string topic, string message,string rosMsgType) 
+    private async void UnSubscribe(string profile, string subscriptionId)
     {
-        Console.WriteLine($"Received message on {topic} with msg [{rosMsgType}] {message}");
-        messages.Add((DateTime.Now, topic, message));
+        await hubConnection.InvokeAsync("UnSubscribe", profile, subscriptionId);
+        values.Remove(subscriptionId);
+        
         StateHasChanged();
     }
 
+    // private void RecieveSubscriptionMessage(string topic, string message, string rosMsgType)
+    // {
+
+    // }
+
+    private void RecieveSubscriptionValueRecord(SubscriptionValueRecord record)
+    {
+        // Logger.LogInformation("update from {}, from topic {}[{}]:{}, {}", record.Profile, record.Topic, record.RosName, record.Data, values.ContainsKey(record.Id));
+        if (values.ContainsKey(record.Id))
+        {
+            values[record.Id] = (DateTime.Now, record);
+            StateHasChanged();
+        }
+
+        else
+        {
+            
+        }
+
+    }
 
 
     private void ShowNodeDetails(string node)
     {
         activeDetail = ActiveDetail.Node;
-        activeDetailObject = node;
+        activeNode = node;
 
-        Logger.LogInformation($"Showing topic details for {activeDetailObject} {activeDetail}");
+        Logger.LogInformation($"Showing topic details for {activeNode} {activeDetail}");
         StateHasChanged();
+        ScanSystemData();
     }
 
     private void ShowTopicDetails(RosTopic topic)
     {
+        
         activeDetail = ActiveDetail.Topic;
-        activeDetailObject = topic;
+        activeTopic = topic;
 
-        Logger.LogInformation($"Showing topic details for {activeDetailObject} {activeDetail}");
+        Logger.LogInformation($"Showing topic details for {activeTopic} {activeDetail}");
         StateHasChanged();
+        ScanSystemData();
     }
 }
