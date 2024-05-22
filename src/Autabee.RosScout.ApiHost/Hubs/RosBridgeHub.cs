@@ -39,12 +39,17 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
             Console.WriteLine(obj.GetType());
             if (obj.GetType().IsSubclassOf(typeof(Message)))
             {
-                rosBridge.Publish(Clients.Caller.ToString(), hostName, topic, (Message)obj);
+                rosBridge.Publish(hostName, topic, (Message)obj);
             }
             else
             {
                 //rosBridge.Publish(Clients.Caller.ToString(), hostName, topic, message);
             }
+        }
+
+        public void ProfilePublish(RosProfilePublish msg)
+        {
+            rosBridge.Publish(msg);
         }
     }
 }

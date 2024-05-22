@@ -32,6 +32,9 @@ internal class Program
             NavLinked = true
         });
 
+        builder.Services.AddSingleton<JsonToRosMessageFactory>(s => new JsonToRosMessageFactory());
+        builder.Services.AddSingleton<JsonStringRosMessageFactory>(s => new JsonStringRosMessageFactory());
+
         builder.Services.AddMudServices();
         var app = builder.Build();
         app.RunAsync();

@@ -47,6 +47,9 @@ namespace Autabee.WasmHostApi
             builder.Configuration.AddConfiguration(rosConfig);
             builder.Services.AddTransient(s => rosConfig.Get<RosSettings>());
 
+            builder.Services.AddTransient<JsonToRosMessageFactory>(s => new JsonToRosMessageFactory());
+            builder.Services.AddTransient<JsonStringRosMessageFactory>(s=> new JsonStringRosMessageFactory());
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

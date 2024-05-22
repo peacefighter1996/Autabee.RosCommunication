@@ -1,0 +1,57 @@
+﻿@using Autabee.Communication.RosClient.Dto
+@using Autabee.Communication.RosClient
+@using Microsoft.AspNetCore.Components.Web
+@using MudBlazor
+
+@inject JsonStringRosMessageFactory jsonFactory;
+<h4>@topic.Name : @topic.Type</h4>
+<MudTextField T="string" Label="Filled" Variant="Variant.Filled" @bind-Text="@json" AutoGrow=true A />
+<button class="btn btn-primary mdi mdi-send" @onclick=Publish>Publish</button>
+<button class="btn btn-primary mdi mdi-reset" @onclick=ResetType>Reset</button>
+
+@code {
+    private string json = "";
+    private RosTopic topic;
+    private Func<string> builder = () => "";
+    [Parameter]
+    public RosTopic rosTopic
+    {
+        get => topic;
+        set
+        {
+            if (value != null && value != topic)
+            {
+                topic = value;
+                Console.WriteLine(jsonFactory.ToString());
+                Console.WriteLine(string.Join(",",jsonFactory.GetKeys()));
+                try
+                {
+                    builder = jsonFactory.BuildDefault(topic.Type);
+                    json = builder();
+                }catch(Exception e){
+                    Console.WriteLine(e);
+                    builder = () => "";
+                    json = "Not Found";
+                }
+            InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+
+    [Parameter]
+    public string Profile { get; set; }
+
+
+    [Parameter]
+    public EventCallback<RosProfilePublish> OnPublish { get; set; }
+
+    private void Publish()
+    {
+
+        OnPublish.InvokeAsync(new RosProfilePublish(json, Profile, rosTopic));
+    }
+    private void ResetType()
+    {
+        json = builder();
+    }
+}

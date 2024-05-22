@@ -1,0 +1,72 @@
+﻿@using Autabee.Communication.RosClient.Dto
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+<h3>JoystickControl</h3>
+
+<input type="text" id="joystickControl" value="0" @onkeydown="KeyDown" @onkeyup="KeyUp"/>
+
+@code {
+    [Parameter]
+    public string activeNode { get; set; } = string.Empty;
+
+    [Parameter]
+    public RosTopic publishTopic { get; set; }
+
+    private List<string> keysDown = new List<string>();
+
+    protected override Task OnInitializedAsync()
+    {
+        var hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/rosbridgehub"))
+                .Build();
+
+
+        return base.OnInitializedAsync();
+    }
+
+
+    private void OnTick()
+    {
+        var twist = new RosSharp.RosBridgeClient.MessageTypes.Geometry.Twist();
+
+        if (keysDown.Contains("ArrowUp") || keysDown.Contains("W"))
+        {
+            twist.linear.x = 1;
+        }
+        if (keysDown.Contains("ArrowDown") || keysDown.Contains("S"))
+        {
+            twist.linear.x = -1;
+        }
+        if (keysDown.Contains("ArrowLeft") || keysDown.Contains("A"))
+        {
+            twist.angular.z = 1;
+        }
+        if (keysDown.Contains("ArrowRight") || keysDown.Contains("D"))
+        {
+            twist.angular.z = -1;
+        }
+
+        if (twist.linear.x != 0 || twist.angular.z != 0)
+        {
+            //publishTopic.Publish(twist);
+        }
+    }
+
+
+    private void KeyDown(KeyboardEventArgs e)
+    {
+        if (!keysDown.Contains(e.Key))
+        {
+            keysDown.Add(e.Key);
+        }
+    }
+    private void KeyUp(KeyboardEventArgs e)
+    {
+        if (keysDown.Contains(e.Key))
+        {
+            keysDown.Remove(e.Key);
+        }
+    }
+
+}

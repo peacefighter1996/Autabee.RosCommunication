@@ -10,11 +10,11 @@
     </thead>
     <tbody>
         <tr><td>Details of:</td><td>Topic</td></tr>
-        <tr><td>Name:</td><td>@activeTopic.Name</td></tr>
-        <tr><td>Message Type:</td><td>@activeTopic.Type</td></tr>
+        <tr><td>Name:</td><td>@ActiveTopic.Name</td></tr>
+        <tr><td>Message Type:</td><td>@ActiveTopic.Type</td></tr>
     </tbody>
 
-    @if (system.subscribers.Any(o => o.Name == activeTopic.Name))
+    @if (System.subscribers.Any(o => o.Name == ActiveTopic.Name))
     {
         <thead>
             <tr>
@@ -22,7 +22,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var topic in system.publishers.First(o => o.Name == activeTopic.Name).nodes)
+            @foreach (var topic in System.subscribers.First(o => o.Name == ActiveTopic.Name).nodes)
             {
                 <tr>
                     <td colspan="2">@topic</td>
@@ -39,7 +39,7 @@
         </thead>
     }
 
-    @if (system.publishers.Any(o => o.Name == activeTopic.Name))
+    @if (System.publishers.Any(o => o.Name == ActiveTopic.Name))
     {
         <thead>
             <tr>
@@ -47,7 +47,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var topic in system.publishers.First(o => o.Name == activeTopic.Name).nodes)
+            @foreach (var topic in System.publishers.First(o => o.Name == ActiveTopic.Name).nodes)
             {
                 <tr>
                     <td colspan="2">@topic</td>
@@ -68,8 +68,23 @@
 
 @code {
     [Parameter]
-    public RosTopic activeTopic { get; set; }
+    public RosTopic ActiveTopic { get; set; } = new RosTopic("","");
 
     [Parameter]
-    public RosSystem system { get; set; }
+    public RosSystem System { get; set; } = new RosSystem(new RosConnection[0], new RosConnection[0],new RosConnection[0]);
+
+    protected override Task OnInitializedAsync()
+    {
+        if (ActiveTopic == null)
+        {
+            throw new ArgumentNullException(nameof(ActiveTopic));
+        }
+
+        if (System == null)
+        {
+            throw new ArgumentNullException(nameof(System));
+        }
+
+        return base.OnInitializedAsync();
+    }
 }

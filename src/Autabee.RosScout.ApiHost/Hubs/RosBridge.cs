@@ -1,4 +1,5 @@
 ﻿using Autabee.Communication.RosClient;
+using Autabee.Communication.RosClient.Dto;
 using RosSharp.RosBridgeClient;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
@@ -20,11 +21,17 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
         public event RosBridgeSubscriptionHandler SubscriptionMsgUpdate;
 
         public List<string> DisconnectedSockets = new List<string>();
+        readonly JsonToRosMessageFactory messageFactory;
+        public ILogger<RosBridge> logger;
 
-        public RosBridge(RosSettings rosSettings)
+
+        public RosBridge(RosSettings rosSettings, JsonToRosMessageFactory messageFactory, ILogger<RosBridge> logger)
         {
+            this.messageFactory = messageFactory;
             this.rosSettings = rosSettings;
             this.rosSocket = new Dictionary<string, RosSocket>();
+            this.logger = logger;
+            
             foreach (var item in this.rosSettings.Profiles)
             {
                 var bridge = new RosSocket(new RosSharp.RosBridgeClient.Protocols.WebSocketNetProtocol(item.Bridge), false);
@@ -99,7 +106,7 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
         }
 
 
-        public async void Publish(string caller, string hostName, string topic, Message msg)
+        public async void Publish(string hostName, string topic, Message msg)
         {
             if (!rosSocket.TryGetValue(hostName, out RosSocket socket))
             {
@@ -147,6 +154,29 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
         public void Connect(string item)
         {
             rosSocket[item].Connect();
+        }
+        public void Publish(RosProfilePublish msg)
+        {
+            if (!rosSocket.TryGetValue(msg.profile, out RosSocket socket))
+            {
+                return;
+            }
+
+            try
+            {
+                var message = messageFactory.GetMessage(msg.topic.Type, msg.json);
+                if (!message.Success)
+                {
+                    return;
+                }
+
+                Publish(msg.profile, msg.topic.Name, message.Object);
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex.Message);
+                return;
+            }
         }
     }
 }

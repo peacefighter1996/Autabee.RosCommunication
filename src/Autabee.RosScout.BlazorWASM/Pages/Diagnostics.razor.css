@@ -59,11 +59,46 @@
   }
   #diag-publish {
     grid-area: diag-publish;
+    
   }
-  #diag-log {
 
-    grid-area: diag-log;
-  }
+    #diag-publish > .InnerItem {
+        display: flex;
+        display:grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            'publish-head'
+            'publish-text'
+            'publish-button';
+        flex-direction: column;
+        overflow-x: clip;
+        overflow-y: auto;
+    }
+
+    #diag-publish > .InnerItem > h4 {
+        grid-area: publish-head;
+        padding: 5px;
+        padding-left: 1em;
+        margin: 0px;
+    }
+
+        #diag-publish > .InnerItem > .mud-input-control {
+/*            overflow-x: auto;
+            grid-area: publish-text;*/
+        }
+
+    #diag-publish > .InnerItem > button {
+        /* make buttons string to bottom*/
+        grid-area: publish-button;
+        margin-top: auto;
+
+    }
+
+
+    #diag-log {
+        grid-area: diag-log;
+    }
 
   #diag-log > div {
     display: flex;

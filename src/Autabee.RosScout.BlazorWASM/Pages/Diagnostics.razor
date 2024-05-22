@@ -3,6 +3,7 @@
 @using Autabee.Communication.RosClient
 @using Autabee.Communication.RosClient.Dto
 @using Autabee.RosScout.Components
+@using Autabee.RosScout.Components.msg
 @using Microsoft.AspNetCore.SignalR.Client
 @using Newtonsoft.Json
 @using RosSharp.RosBridgeClient
@@ -34,10 +35,10 @@
     </div>
     <div class="Viewport" id="diag-topic">
         @* <div class="Viewportheader"> *@
-            <h3>Topic</h3>
-            
+        <h3>Topic</h3>
+
         @* </div> *@
-        
+
         <div class="InnerItem" style="width:100%">
             <table class="datatable" style="width: 100%;">
                 <thead>
@@ -125,7 +126,7 @@
             }
             else if (activeDetail == ActiveDetail.Topic)
             {
-                <TopicDetailView activeTopic="@activeTopic" system="@system" />
+                <TopicDetailView ActiveTopic="@activeTopic" System="@system" />
             }
             else
             {
@@ -141,48 +142,39 @@
     </div>
     <div class="Viewport" id="diag-publish">
         <h3>Publish</h3>
-        <div class="InnerItem">
-            <div class="selectedMaster">
-                <label for="messageInput">Message:</label>
-                <input id="messageInput" @bind="inputMessage" @onkeydown="CheckForEnterKey" />
-                <button @onclick="PublishMessage">Publish</button>
+        @if (activeTopic.Name != string.Empty)
+        {
+            <div class="InnerItem">
+                <JsonSend rosTopic=@activeTopic Profile=@activeProfile OnPublish="PublishMessage" />
             </div>
+        }
+        else
+        {
+            <div class="InnerItem">
+                <h4>No topic selected</h4>
+            </div>
+        }
+        @* <div class="InnerItem">
+        <div class="selectedMaster">
+        <label for="messageInput">Message:</label>
+        <input id="messageInput" @bind="inputMessage" @onkeydown="CheckForEnterKey" />
+        <button @onclick="PublishMessage">Publish</button>
+        </div>
         </div>
         @code {
-            string inputMessage = "";
+        string inputMessage = "";
 
-            private async void PublishMessage()
-            {
-                Console.WriteLine($"Publishing message {inputMessage}");
-                var message = new std_msgs.String { data = inputMessage };
 
-                try
-                {
-                    var str = Newtonsoft.Json.JsonConvert.SerializeObject((Message)message, new JsonSerializerSettings()
-                {
-                    ObjectCreationHandling = ObjectCreationHandling.Auto,
-                    TypeNameHandling = TypeNameHandling.All
-                });
-                    Console.WriteLine(str);
-                    Console.WriteLine("Sending message to SignalR");
-                    await hubConnection.SendAsync("Publish", "default", "/subscription_test", str);
 
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-
-            private void CheckForEnterKey(KeyboardEventArgs e)
-            {
-                StateHasChanged(); // Force UI to aram(){"autabee.blazor"});
-                if (e.Key == "Enter")
-                {
-                    PublishMessage();
-                }
-            }
+        private void CheckForEnterKey(KeyboardEventArgs e)
+        {
+        StateHasChanged(); // Force UI to aram(){"autabee.blazor"});
+        if (e.Key == "Enter")
+        {
+        PublishMessage();
         }
+        }
+        } *@
     </div>
     <div class="Viewport" id="diag-log">
         <h3>Log</h3>
@@ -212,7 +204,7 @@
     IEnumerable<string> nodes = new string[0];
     private HubConnection? hubConnection;
 
-    private Dictionary<string, (DateTime, SubscriptionValueRecord)> values = new ();
+    private Dictionary<string, (DateTime, SubscriptionValueRecord)> values = new();
 
 
     enum ActiveDetail
@@ -353,7 +345,7 @@
     {
         await hubConnection.InvokeAsync("UnSubscribe", profile, subscriptionId);
         values.Remove(subscriptionId);
-        
+
         StateHasChanged();
     }
 
@@ -373,7 +365,7 @@
 
         else
         {
-            
+
         }
 
     }
@@ -391,12 +383,26 @@
 
     private void ShowTopicDetails(RosTopic topic)
     {
-        
+
         activeDetail = ActiveDetail.Topic;
         activeTopic = topic;
 
         Logger.LogInformation($"Showing topic details for {activeTopic} {activeDetail}");
         StateHasChanged();
         ScanSystemData();
+    }
+
+
+    private async void PublishMessage(RosProfilePublish publish)
+    {
+        try
+        {
+            Logger.LogInformation("Publishing message to {}:{}:{} ", publish.profile, publish.topic.Name, publish.json);
+            await hubConnection.SendAsync("ProfilePublish", publish);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }
