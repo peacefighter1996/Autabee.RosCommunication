@@ -33,8 +33,6 @@ The following libraries are used in this project:
 - **[RosSharp](https://github.com/Autabee/ros-sharp)**: Originally developed by Siemens, this library is used to communicate with ROS. However, due to stalled development and specific requirements, this library is forked and modified to support specific needs of this project. (Update follows soon)
 
 ## Course Usage
-> :warning: **Warning** 
-> This is a draft of these conditions, will be updated before `23:59 17/5/2024`. After discussion with colleagues on specific and discussion with (potential) contributors.  
 
 This project is developed as part of the TU-Delft course `RO47007 Multidisciplinary Project 2023/24` by group 11. However, while this project is open source and can be used by anyone. Due to the nature of the project and course development, usage comes with the following conditions and social contract.  
 
