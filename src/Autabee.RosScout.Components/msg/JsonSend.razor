@@ -43,12 +43,12 @@
 
 
     [Parameter]
-    public EventCallback<RosProfilePublish> OnPublish { get; set; }
+    public EventCallback<RosProfileJsonMessagePublish> OnPublish { get; set; }
 
     private void Publish()
     {
 
-        OnPublish.InvokeAsync(new RosProfilePublish(json, Profile, rosTopic));
+        OnPublish.InvokeAsync(new RosProfileJsonMessagePublish(json, Profile, rosTopic));
     }
     private void ResetType()
     {

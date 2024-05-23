@@ -47,7 +47,7 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
             }
         }
 
-        public void ProfilePublish(RosProfilePublish msg)
+        public void ProfilePublish(RosProfileJsonMessagePublish msg)
         {
             rosBridge.Publish(msg);
         }

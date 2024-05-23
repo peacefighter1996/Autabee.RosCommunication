@@ -145,7 +145,14 @@
         @if (activeTopic.Name != string.Empty)
         {
             <div class="InnerItem">
-                <JsonSend rosTopic=@activeTopic Profile=@activeProfile OnPublish="PublishMessage" />
+                @if (activeTopic.Type == RosSharp.RosBridgeClient.MessageTypes.Geometry.Twist.RosMessageName)
+                {
+                    <TwistControlText Profile=@activeProfile rosTopic=@activeTopic OnPublish="PublishMessage" />
+                }
+                else
+                {
+                    <JsonSend rosTopic=@activeTopic Profile=@activeProfile OnPublish="PublishMessage" />
+                }
             </div>
         }
         else
@@ -393,11 +400,11 @@
     }
 
 
-    private async void PublishMessage(RosProfilePublish publish)
+    private async void PublishMessage(RosProfileJsonMessagePublish publish)
     {
         try
         {
-            Logger.LogInformation("Publishing message to {}:{}:{} ", publish.profile, publish.topic.Name, publish.json);
+            //Logger.LogInformation("Publishing message to {}:{}:{} ", publish.profile, publish.topic.Name, publish.json);
             await hubConnection.SendAsync("ProfilePublish", publish);
         }
         catch (Exception ex)

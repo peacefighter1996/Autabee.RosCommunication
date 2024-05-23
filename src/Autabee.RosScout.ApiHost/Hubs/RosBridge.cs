@@ -155,7 +155,7 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
         {
             rosSocket[item].Connect();
         }
-        public void Publish(RosProfilePublish msg)
+        public void Publish(RosProfileJsonMessagePublish msg)
         {
             if (!rosSocket.TryGetValue(msg.profile, out RosSocket socket))
             {

@@ -1,0 +1,117 @@
+﻿@using Autabee.Communication.RosClient.Dto
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Components.Web
+@using System.Text.Json
+@using Microsoft.Extensions.Logging
+@using MudBlazor
+@inject NavigationManager NavigationManager
+@inject ILogger<TwistControlText> Logger
+<h3>JoystickControl</h3>
+
+<MudNumericField @bind-Value="linear" Label="Linear speed" Variant="Variant.Text" Min="0" Max="100" Step="0.2" />
+<MudNumericField @bind-Value="angular" Label="angular speed" Variant="Variant.Text" Min="0" Max="100" Step="0.2" />
+
+<input type="text" @bind-value=@Text @onkeydown="KeyDown" @onkeyup="KeyUp" style="height:100%" />
+
+@code {
+    [Parameter]
+    public string Profile { get; set; } = string.Empty;
+
+    [Parameter]
+    public RosTopic rosTopic { get; set; }
+
+    private List<string> keysDown = new List<string>();
+    private bool lastMove = false;
+    [Parameter]
+    public EventCallback<RosProfileJsonMessagePublish> OnPublish { get; set; }
+
+    private Timer timer;
+    string text = "Select text field and use WASD to move the robot and QE to rotate the robot";
+    string sink = string.Empty;
+    private double linear = 0.8;
+    private double angular = 3;
+
+    string Text
+    {
+        get => text; set
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+    protected override Task OnInitializedAsync()
+    {
+        timer = new Timer(OnTick, null, 0, 100);
+
+        return base.OnInitializedAsync();
+    }
+
+
+    private void OnTick(object state)
+    {
+        var twist = new RosSharp.RosBridgeClient.MessageTypes.Geometry.Twist();
+
+        if (keysDown.Contains("ArrowUp") || keysDown.Contains("W") || keysDown.Contains("w"))
+        {
+            twist.linear.x += linear;
+        }
+        if (keysDown.Contains("ArrowDown") || keysDown.Contains("S") || keysDown.Contains("s"))
+        {
+            twist.linear.x += -linear;
+        }
+        if (keysDown.Contains("ArrowLeft") || keysDown.Contains("A") || keysDown.Contains("a"))
+        {
+            twist.linear.y += linear;
+        }
+        if (keysDown.Contains("ArrowRight") || keysDown.Contains("D") || keysDown.Contains("d"))
+        {
+            twist.linear.y += -linear;
+        }
+        if (keysDown.Contains("Q") || keysDown.Contains("q"))
+        {
+            twist.angular.z += angular;
+        }
+        if (keysDown.Contains("E") || keysDown.Contains("e"))
+        {
+            twist.angular.z += -angular;
+        }
+
+        Logger.LogInformation(string.Join(",", keysDown));
+
+        if (twist.linear.x != 0 || twist.linear.y != 0 || twist.angular.z != 0)
+        {
+            lastMove = true;
+            var json = JsonSerializer.Serialize(twist);
+            Logger.LogInformation(json);
+            OnPublish.InvokeAsync(new RosProfileJsonMessagePublish(json, Profile, rosTopic));
+        }
+        else
+        {
+            if (lastMove)
+            {
+                lastMove = false;
+                var json = JsonSerializer.Serialize(new RosSharp.RosBridgeClient.MessageTypes.Geometry.Twist());
+                OnPublish.InvokeAsync(new RosProfileJsonMessagePublish(json, Profile, rosTopic));
+            }
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+
+    private void KeyDown(KeyboardEventArgs e)
+    {
+
+        if (!keysDown.Contains(e.Key))
+        {
+            keysDown.Add(e.Key);
+        }
+    }
+    private void KeyUp(KeyboardEventArgs e)
+    {
+        if (keysDown.Contains(e.Key))
+        {
+            keysDown.Remove(e.Key);
+        }
+    }
+
+}
