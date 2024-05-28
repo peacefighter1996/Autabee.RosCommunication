@@ -13,6 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject ILogger<Diagnostics> Logger
 @inject InMemoryLog log;
+@inject RosScoutMemory memory;
 
 
 <PageTitle>Ros Scout Diagnostics</PageTitle>
@@ -248,23 +249,35 @@
         }
         try
         {
-            var tmp = await Http.GetFromJsonAsync<RosSettings>("/api/Robots/getRosSettings/");
-
-            if (tmp != null)
-            {
-                Logger.LogInformation(JsonConvert.SerializeObject(tmp.Profiles));
-                rosSettings = tmp;
-                SelectProfileChanged(rosSettings.Profiles.FirstOrDefault().Name);
-            }
-            else
-            {
-                Logger.LogInformation("No settings found");
-            }
+            rosSettings = new RosSettings();
+            rosSettings.Profiles = (await memory.GetRosProfiles()).ToList();
+            ActiveProfile = rosSettings.Profiles.FirstOrDefault()?.Name ?? "default";
         }
         catch (Exception ex)
         {
             Logger.LogInformation(ex.Message);
         }
+
+        memory.ProfileDataUpdate += async (sender, e) =>
+        {
+            if (e is RosProfile profile)
+            {
+                if (ActiveProfile  == profile.Name)
+                {
+                    UpdateSystem();
+                }
+            }
+        };
+    }
+
+
+    private void UpdateSystem()
+    {
+        system = memory.RosSystems[ActiveProfile];
+        topics = memory.RosTopics[ActiveProfile].ToList();
+        nodes = system.GetNodes();
+
+        InvokeAsync(StateHasChanged);
     }
 
     private async void SelectProfileChanged(string profile)
@@ -279,51 +292,10 @@
         Logger.LogInformation($"Changing profile to {profile}");
         activeProfile = profile;
 
-        ScanSystemData(profile);
+        UpdateSystem();
     }
 
-    private void ScanSystemData() => ScanSystemData(activeProfile);
-
-    private async void ScanSystemData(string profile)
-    {
-        try
-        {
-            RosProfile rosProfile = rosSettings.Profiles.FirstOrDefault(o => o.Name == profile);
-            if (rosProfile == null)
-            {
-                Logger.LogInformation("Profile not found");
-                return;
-            }
-
-            var postBody = rosProfile.Master;
-
-
-
-            var http = await Http.PostAsJsonAsync("/api/RosMaster/getTopicTypes/rosScout", postBody);
-            if (http.StatusCode != System.Net.HttpStatusCode.OK)
-            {
-                Logger.LogError($"Error getting topics {http.StatusCode}");
-                return;
-            }
-
-            var result = await http.Content.ReadFromJsonAsync<List<RosTopic>>();
-
-            Logger.LogInformation(JsonConvert.SerializeObject(result));
-            topics = result ?? new List<RosTopic>();
-
-            Logger.LogInformation("Getting system");
-
-            http = await Http.PostAsJsonAsync("/api/RosMaster/getSystemState/rosScout", postBody);
-            system = await http.Content.ReadFromJsonAsync<RosSystem>();
-            Logger.LogInformation(system.ToString());
-            nodes = system.GetNodes();
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex.Message);
-        }
-        await InvokeAsync(StateHasChanged);
-    }
+    private void ScanSystemData() => memory.ScanSystemData(ActiveProfile);
 
     // private async void SubscriptionHandler(string topic, std_msgs.String message)
     // {
@@ -337,7 +309,11 @@
 
     private async void Subscribe(RosTopic topic)
     {
+        Logger.LogInformation($"Subscribing to {topic.Name}, {hubConnection.State}");
+
         var value = await hubConnection.InvokeAsync<string>("Subscribe", activeProfile, topic.Name);
+
+        Logger.LogInformation($"Subscribed to {topic.Name} with id {value}");
         if (!string.IsNullOrEmpty(value) && value.StartsWith("/"))
         {
             var emptyRecord = new SubscriptionValueRecord(value, topic.Name, activeProfile, topic.Type, string.Empty);
