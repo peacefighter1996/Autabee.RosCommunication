@@ -252,6 +252,7 @@
             rosSettings = new RosSettings();
             rosSettings.Profiles = (await memory.GetRosProfiles()).ToList();
             ActiveProfile = rosSettings.Profiles.FirstOrDefault()?.Name ?? "default";
+            UpdateSystem();
         }
         catch (Exception ex)
         {
@@ -262,6 +263,7 @@
         {
             if (e is RosProfile profile)
             {
+                Logger.LogInformation($"Profile update {profile.Name}");
                 if (ActiveProfile  == profile.Name)
                 {
                     UpdateSystem();
@@ -273,10 +275,16 @@
 
     private void UpdateSystem()
     {
-        system = memory.RosSystems[ActiveProfile];
-        topics = memory.RosTopics[ActiveProfile].ToList();
-        nodes = system.GetNodes();
-
+        try
+        {
+            system = memory.RosSystems[ActiveProfile];
+            topics = memory.RosTopics[ActiveProfile].ToList();
+            nodes = system.GetNodes();
+        }
+        catch(Exception ex)
+        {
+            Logger.LogInformation(ex.Message);
+        }
         InvokeAsync(StateHasChanged);
     }
 
