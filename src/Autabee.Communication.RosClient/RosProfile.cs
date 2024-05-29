@@ -1,4 +1,5 @@
 ﻿using RosSharp.RosBridgeClient;
+using RosSharp.RosBridgeClient.MessageTypes.Rosapi;
 
 namespace Autabee.Communication.RosClient
 {
@@ -18,6 +19,8 @@ namespace Autabee.Communication.RosClient
         public string Bridge { get; set; } = string.Empty;
         public string Master { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+        public string MachineType { get; set; } = string.Empty;
+        public object MachineParameters { get; set; } = new object();
 
     }
 

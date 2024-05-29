@@ -148,7 +148,7 @@
             <div class="InnerItem">
                 @if (activeTopic.Type == RosSharp.RosBridgeClient.MessageTypes.Geometry.Twist.RosMessageName)
                 {
-                    <TwistControlText Profile=@activeProfile rosTopic=@activeTopic OnPublish="PublishMessage" />
+                    <TwistControlText Profile=@activeProfile RosTopic=@activeTopic OnPublish="PublishMessage" />
                 }
                 else
                 {
@@ -259,19 +259,25 @@
             Logger.LogInformation(ex.Message);
         }
 
-        memory.ProfileDataUpdate += async (sender, e) =>
-        {
-            if (e is RosProfile profile)
-            {
-                Logger.LogInformation($"Profile update {profile.Name}");
-                if (ActiveProfile  == profile.Name)
-                {
-                    UpdateSystem();
-                }
-            }
-        };
+        memory.ProfileDataUpdate += Memory_ProfileUpdated;
+        await memory.Init();
+    }
+    public void Dispose()
+    {
+        memory.ProfileDataUpdate -= Memory_ProfileUpdated;
     }
 
+    private async void Memory_ProfileUpdated(object? sender, RosProfile e)
+    {
+       
+        if (ActiveProfile != null && ActiveProfile == e.Name)
+        {
+            ActiveProfile = e.Name;
+
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
 
     private void UpdateSystem()
     {

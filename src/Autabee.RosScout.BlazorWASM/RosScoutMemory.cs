@@ -1,5 +1,6 @@
 using Autabee.Communication.RosClient;
 using Autabee.Communication.RosClient.Dto;
+using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
 
@@ -13,18 +14,33 @@ public class RosScoutMemory
     readonly ILogger<RosScoutMemory> logger;
 
     public event EventHandler<RosProfile> ProfileDataUpdate;
+    bool isInitialized = false;
 
     public RosScoutMemory(HttpClient http, ILogger<RosScoutMemory> logger)
     {
         this.logger = logger;
         this.http = http;
 
-        GetRosProfiles();
+        logger.LogInformation("RosScoutMemory created");
+       
+    }
 
-        foreach (var profile in RosProfiles)
+    public async Task Init()
+    {
+        if (!isInitialized)
         {
-            ScanSystemData(profile);
+            logger.LogInformation("Getting profiles");
+            await GetRosProfiles();
+            logger.LogInformation("Scanning systems");
+
+            foreach (var profile in RosProfiles)
+            {
+                logger.LogInformation($"Scanning {profile.Name}");
+                await ScanSystemData(profile);
+            }
+            isInitialized = true;
         }
+        
     }
 
     public RosProfile? GetRosProfile(string name)
@@ -32,17 +48,22 @@ public class RosScoutMemory
         return RosProfiles.FirstOrDefault(r => r.Name == name);
     }
 
-    public void ScanSystemData(string name)
+    public RosSystem? GetRosSystem(string name)
+    {
+        return RosSystems.ContainsKey(name) ? RosSystems[name] : null;
+    }
+
+    public async void ScanSystemData(string name)
     {
         var profile = GetRosProfile(name);
         if (profile == null)
         {
             return;
         }
-        ScanSystemData(profile);
+        await ScanSystemData(profile);
     }
 
-    public async void ScanSystemData(RosProfile rosProfile)
+    public async Task ScanSystemData(RosProfile rosProfile)
     {
         try
         {
@@ -55,12 +76,16 @@ public class RosScoutMemory
             var postBody = rosProfile.Master;
 
 
-
-            var httpResult = await http.PostAsJsonAsync("/api/RosMaster/getTopicTypes/rosScout", postBody);
+            var token = new CancellationTokenSource(2000).Token;
+            var httpResult = await http.PostAsJsonAsync("/api/RosMaster/getTopicTypes/rosScout", postBody, token);
             if (httpResult.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 logger.LogError($"Error getting topics {httpResult.StatusCode}");
                 return;
+            }
+            else
+            {
+                logger.LogInformation("Got topics");
             }
 
             var result = await httpResult.Content.ReadFromJsonAsync<List<RosTopic>>();
@@ -100,6 +125,7 @@ public class RosScoutMemory
         }
 
         ProfileDataUpdate?.Invoke(this, rosProfile);
+
     }
 
     public async Task<RosProfile[]> GetRosProfiles()

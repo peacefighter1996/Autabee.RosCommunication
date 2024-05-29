@@ -19,7 +19,7 @@
     public string Profile { get; set; } = string.Empty;
 
     [Parameter]
-    public RosTopic rosTopic { get; set; }
+    public RosTopic RosTopic { get; set; }
 
     private List<string> keysDown = new List<string>();
     private bool lastMove = false;
@@ -83,7 +83,7 @@
             lastMove = true;
             var json = JsonSerializer.Serialize(twist);
             Logger.LogInformation(json);
-            OnPublish.InvokeAsync(new RosProfileJsonMessagePublish(json, Profile, rosTopic));
+            OnPublish.InvokeAsync(new RosProfileJsonMessagePublish(json, Profile, RosTopic));
         }
         else
         {
@@ -91,7 +91,7 @@
             {
                 lastMove = false;
                 var json = JsonSerializer.Serialize(new RosSharp.RosBridgeClient.MessageTypes.Geometry.Twist());
-                OnPublish.InvokeAsync(new RosProfileJsonMessagePublish(json, Profile, rosTopic));
+                OnPublish.InvokeAsync(new RosProfileJsonMessagePublish(json, Profile, RosTopic));
             }
         }
         InvokeAsync(StateHasChanged);

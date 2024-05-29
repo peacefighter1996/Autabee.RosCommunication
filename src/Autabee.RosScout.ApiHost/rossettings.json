@@ -10,7 +10,8 @@
         "Version": "Noetic",
         "Bridge": "ws://Mirte-DF9644:9090",
         "Master": "http://Mirte-DF9644:11311",
-        "Name": "TerraDiscovery1"
+        "Name": "TerraDiscovery1", 
+        "MachineType": "TerraDiscovery"
     }
   ]
 }

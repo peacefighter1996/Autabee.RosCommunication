@@ -1,0 +1,16 @@
+
+#control-page {
+    grid-template-areas:
+        'robot-selection robot-control robot-control robot-control';
+    grid-template-columns: 180px 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    display: grid;
+    height: 100vh;
+    max-height: 100%;
+}
+#robot-selection {
+    grid-area: robot-selection;
+}
+#robot-control {
+    grid-area: robot-control;
+}

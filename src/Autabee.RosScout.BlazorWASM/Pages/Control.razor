@@ -1,14 +1,89 @@
 ﻿@page "/control"
+@using Autabee.Communication.RosClient
+@using Autabee.RosScout.Components.ControlPages
+@implements IDisposable 
+@inject RosScoutMemory memory
+@inject ILogger<Control> logger
 
 <PageTitle>Ros Scout Control</PageTitle>
 
+<!--Side panel with all robot profiles-->
+<div id="control-page">
+    <div id="robot-selection" class="Viewport">
+        <h3>Robots</h3>
+        <ul>
+            @foreach (var robot in memory.RosProfiles)
+            {
+                <li>
+                    <button class="mdi mdi-robot" @onclick="() => SelectRobot(robot.Name)">@robot.Name</button>
+                </li>
+            }
+        </ul>
+    </div>
+    <div id="robot-control">
+        @if (currentRobot == null)
+        {
+            <h1>No profile selected or available</h1>
+        }
+        else
+        {
 
+            @switch (currentRobot.MachineType)
+            {
+                case "TerraDiscovery":
+                    <h1>Selected Terra Discovery Robot: @currentRobot.Name</h1>
+
+                    <p>Master: @currentRobot.Master</p>
+                    <p>Bridge: @currentRobot.Bridge</p>
+                    <TerraDiscovery robot="@currentRobot" system=@(memory.GetRosSystem(@currentRobot.Name)) />
+                    break;
+
+                case "":
+                default:
+                    <h1>Selected Terra Discovery Robot: @currentRobot.Name</h1>
+
+                    <p>Master: @currentRobot.Master</p>
+                    <p>Bridge: @currentRobot.Bridge</p>
+                    break;
+            }
+
+        }
+    </div>
+</div>
 @code {
-    private int currentCount = 0;
+    RosProfile? currentRobot = null;
 
-    private void IncrementCount()
+    private void SelectRobot(string robotName)
     {
+        currentRobot = memory.GetRosProfile(robotName);
 
-        currentCount++;
+
+        InvokeAsync(StateHasChanged);
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        currentRobot = memory.RosProfiles.FirstOrDefault();
+        memory.ProfileDataUpdate += Memory_ProfileUpdated;
+        await memory.Init();
+        await  InvokeAsync(StateHasChanged);
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        memory.ProfileDataUpdate -= Memory_ProfileUpdated;
+    }
+
+    private async void Memory_ProfileUpdated(object? sender, RosProfile e)
+    {
+        logger.LogInformation("Profile updated: {0}", e.Name);
+        if (currentRobot != null && currentRobot.Name == e.Name)
+        {
+            currentRobot = e;
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
 }

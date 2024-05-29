@@ -1,0 +1,71 @@
+﻿@using Autabee.Communication.RosClient
+@using Autabee.Communication.RosClient.Dto
+@using Autabee.RosScout.Components.msg
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.Extensions.Logging
+@using RosSharp.RosBridgeClient.MessageTypes.Geometry
+@inject ILogger<TerraDiscovery> logger
+@inject NavigationManager navigationManager
+
+<h3>This is the Terra discovery robot control</h3>
+@* <TwistControlText RosTopic=@(new RosTopic("mirthspeed/cmd_vel", Twist.RosMessageName )) Profile=@robot.Name OnPublish=@PublishMessage /> *@
+
+@code {
+    [Parameter]
+    public RosProfile robot { get; set; }
+
+    [Parameter]
+    public RosSystem system { get; set; }
+
+
+    private HubConnection hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // build hub connection to bridge the communication between the server and the client
+        hubConnection = new HubConnectionBuilder().WithUrl(navigationManager.ToAbsoluteUri("/rosbridgehub"))
+            .Build();
+
+        await hubConnection.StartAsync();
+
+        await base.OnInitializedAsync();
+    }
+
+    private async void PublishMessage(RosProfileJsonMessagePublish publish)
+    {
+        try
+        {
+            await hubConnection.SendAsync("ProfilePublish", publish);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+
+    // protected override Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     Logger.LogInformation("NodeDetailView:OnAfterRenderAsync");
+
+
+    //     Logger.LogInformation("{}", activeNode);
+
+    //     foreach (var item in system.publishers)
+    //     {
+    //         string nodes = String.Join(",", item.nodes);
+
+    //         foreach (var node in item.nodes)
+    //         {
+    //             Logger.LogInformation("{},{},{}", activeNode, node, activeNode == node);
+    //         }
+    //         Logger.LogInformation("{} {}", nodes, item.nodes.Where(o => o == activeNode).Count() > 0);
+    //     }
+
+    //     Logger.LogInformation("{} {}", activeNode, system.publishers.Where(o => o.nodes
+    //         .Where(o => o== activeNode).Count() > 0).Count());
+
+
+    //     return base.OnAfterRenderAsync(firstRender);
+    // }
+}
