@@ -23,7 +23,7 @@
     protected override async Task OnInitializedAsync()
     {
         // build hub connection to bridge the communication between the server and the client
-        hubConnection = new HubConnectionBuilder().WithUrl(navigationManager.ToAbsoluteUri("/rosbridgehub"))
+        hubConnection = new HubConnectionBuilder().WithUrl(navigationManager.ToAbsoluteUri("/hub/rosbridge"))
             .Build();
 
         await hubConnection.StartAsync();

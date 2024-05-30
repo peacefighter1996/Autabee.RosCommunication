@@ -234,7 +234,7 @@
         try
         {
             hubConnection = new HubConnectionBuilder()
-                .WithUrl(NavigationManager.ToAbsoluteUri("/rosbridgehub"))
+                .WithUrl(NavigationManager.ToAbsoluteUri("/hub/rosbridge"))
                 .Build();
 
             await hubConnection.StartAsync();

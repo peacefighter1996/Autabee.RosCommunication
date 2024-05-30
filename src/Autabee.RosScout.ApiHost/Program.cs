@@ -79,7 +79,7 @@ namespace Autabee.WasmHostApi
             app.MapRazorPages();
             app.MapControllers();
 
-            app.MapHub<RosBridgeHub>("/rosbridgehub");
+            app.MapHub<RosBridgeHub>("/hub/rosbridge");
 
 
             app.Run();
