@@ -8,7 +8,7 @@
 @inject NavigationManager navigationManager
 
 <h3>This is the Terra discovery robot control</h3>
-@* <TwistControlText RosTopic=@(new RosTopic("mirthspeed/cmd_vel", Twist.RosMessageName )) Profile=@robot.Name OnPublish=@PublishMessage /> *@
+@* <TwistControlText RosTopic=@(new RosTopic("/mobile_base_controller/cmd_vel", Twist.RosMessageName )) Profile=@robot.Name OnPublish=@PublishMessage />  *@
 
 @code {
     [Parameter]
