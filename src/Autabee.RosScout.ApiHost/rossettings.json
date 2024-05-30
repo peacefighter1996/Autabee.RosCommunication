@@ -1,17 +1,24 @@
 {
-  "Profiles": [
-    {
-      "Version": "Noetic",
-      "Bridge": "ws://localhost:9090",
-      "Master": "http://localhost:11311",
-      "Name": "default"
-    },
-    {
-        "Version": "Noetic",
-        "Bridge": "ws://Mirte-DF9644:9090",
-        "Master": "http://Mirte-DF9644:11311",
-        "Name": "TerraDiscovery1", 
-        "MachineType": "TerraDiscovery"
-    }
-  ]
+    "Profiles": [
+        {
+            "Version": "Noetic",
+            "Bridge": "ws://localhost:9090",
+            "Master": "http://localhost:11311",
+            "Name": "default"
+        },
+        {
+            "Version": "Noetic",
+            "Bridge": "ws://Mirte-DF9644:9090",
+            "Master": "http://Mirte-DF9644:11311",
+            "Name": "TerraDiscovery1",
+            "MachineType": "TerraDiscovery"
+        },
+        {
+            "Version": "Noetic",
+            "Bridge": "ws://145.94.192.79:9090",
+            "Master": "http://145.94.192.79:11311",
+            "Name": "TerraDiscovery2",
+            "MachineType": "TerraDiscovery"
+        }
+    ]
 }
