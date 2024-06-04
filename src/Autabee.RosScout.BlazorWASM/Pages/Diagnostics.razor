@@ -269,7 +269,7 @@
 
     private async void Memory_ProfileUpdated(object? sender, RosProfile e)
     {
-       
+
         if (ActiveProfile != null && ActiveProfile == e.Name)
         {
             ActiveProfile = e.Name;
@@ -283,6 +283,7 @@
     {
         try
         {
+            Logger.LogInformation($"Updating system data for {ActiveProfile}");
             system = memory.RosSystems[ActiveProfile];
             topics = memory.RosTopics[ActiveProfile].ToList();
             nodes = system.GetNodes();
