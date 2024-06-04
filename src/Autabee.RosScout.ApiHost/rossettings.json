@@ -8,8 +8,8 @@
         },
         {
             "Version": "Noetic",
-            "Bridge": "ws://Mirte-DF9644:9090",
-            "Master": "http://Mirte-DF9644:11311",
+            "Bridge": "ws://192.168.18.251:9090",
+            "Master": "http://192.168.18.251:11311",
             "Name": "TerraDiscovery1",
             "MachineType": "TerraDiscovery"
         },
