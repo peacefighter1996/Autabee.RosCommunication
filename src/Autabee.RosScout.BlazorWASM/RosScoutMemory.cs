@@ -76,7 +76,7 @@ public class RosScoutMemory
             var postBody = rosProfile.Master;
 
 
-            var token = new CancellationTokenSource(2000).Token;
+            var token = new CancellationTokenSource(10000).Token;
             var httpResult = await http.PostAsJsonAsync("/api/RosMaster/getTopicTypes/rosScout", postBody, token);
             if (httpResult.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -121,6 +121,7 @@ public class RosScoutMemory
         }
         catch (Exception ex)
         {
+            logger.LogError(rosProfile.Name);
             logger.LogError(ex.Message);
         }
 
