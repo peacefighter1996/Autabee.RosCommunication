@@ -87,6 +87,15 @@ namespace Autabee.WasmHostApi.Controllers
             return Ok(validation.ToString());
         }
 
+        [HttpGet("deleteRobotSettings/{robotName}")]
+        public IActionResult DeleteRobot(string robotName)
+        {
+            RosSettings rosSettings = GetSettings();
+            rosSettings.Profiles.RemoveAll(o => o.Name == robotName);
+            WriteToFile(rosSettings);
+            return Ok();
+        }
+
         private void WriteToFile(RosSettings rosSettings)
         {
             string json = JsonConvert.SerializeObject(rosSettings, Newtonsoft.Json.Formatting.Indented);
