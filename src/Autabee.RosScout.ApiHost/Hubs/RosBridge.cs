@@ -8,7 +8,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Autabee.RosScout.WasmHostApi.Hubs
 {
     
-
+    
 
 
     public class RosBridge : IRosBridge
@@ -177,6 +177,15 @@ namespace Autabee.RosScout.WasmHostApi.Hubs
                 logger.LogCritical(ex.Message);
                 return;
             }
+        }
+        public bool GetConnectionState(string robotName)
+        {
+            if (rosSocket.TryGetValue(robotName, out RosSocket socket))
+            {
+                return socket.protocol.IsAlive();
+
+            }
+            return false;
         }
     }
 }

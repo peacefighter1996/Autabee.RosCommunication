@@ -11,12 +11,38 @@
 <div id="control-page">
     <div id="robot-selection" class="Viewport">
         <h3>Robots</h3>
-        <ul>
+        <ul><li>
+                <button class="mdi mdi-refresh" @onclick="GetState">All</button>
+        </li>
             @foreach (var robot in memory.RosProfiles)
             {
-                <li>
-                    <button class="mdi mdi-robot" @onclick="() => SelectRobot(robot.Name)">@robot.Name</button>
-                </li>
+                if (memory.ProfileConnectionState.TryGetValue(robot.Name, out var connection))
+                {
+                    if (connection.master && connection.bridge)
+                    {
+                        <li>
+                            <button class="mdi mdi-robot" @onclick="() => SelectRobot(robot.Name)">@robot.Name</button>
+                        </li>
+                    }
+                    else if (connection.master || connection.bridge)
+                    {
+                        <li>
+                            <button class="mdi mdi-robot-dead" @onclick="() => SelectRobot(robot.Name)">@robot.Name</button>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <button class="mdi mdi-robot-off" @onclick="() => SelectRobot(robot.Name)">@robot.Name</button>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li>
+                        <button class="mdi mdi-help" @onclick="() => SelectRobot(robot.Name)">@robot.Name</button>
+                    </li>
+                }
             }
         </ul>
     </div>
@@ -63,10 +89,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         currentRobot = memory.RosProfiles.FirstOrDefault();
         memory.ProfileDataUpdate += Memory_ProfileUpdated;
-        await memory.Init();
+        memory.ConnectionStateUpdated += Memory_ConnectionStateUpdated;
+        // await memory.Init();
         await  InvokeAsync(StateHasChanged);
         await base.OnInitializedAsync();
     }
@@ -74,6 +101,7 @@
     public void Dispose()
     {
         memory.ProfileDataUpdate -= Memory_ProfileUpdated;
+        memory.ConnectionStateUpdated -= Memory_ConnectionStateUpdated;
     }
 
     private async void Memory_ProfileUpdated(object? sender, RosProfile e)
@@ -86,4 +114,14 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    private async void Memory_ConnectionStateUpdated(object? sender, EventArgs e)
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async void GetState()
+    {
+        await memory.GetState();
+        await InvokeAsync(StateHasChanged);
+    }
 }

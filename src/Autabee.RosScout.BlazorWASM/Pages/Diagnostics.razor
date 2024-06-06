@@ -260,7 +260,7 @@
         }
 
         memory.ProfileDataUpdate += Memory_ProfileUpdated;
-        await memory.Init();
+        // await memory.Init();
     }
     public void Dispose()
     {
@@ -275,6 +275,7 @@
             ActiveProfile = e.Name;
 
         }
+        UpdateSystem();
 
         await InvokeAsync(StateHasChanged);
     }

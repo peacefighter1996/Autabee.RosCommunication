@@ -2,6 +2,8 @@ using Autabee.Communication.RosClient;
 using Autabee.Communication.RosClient.Dto;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
+using System.Data;
+using System.Linq.Expressions;
 using System.Net.Http.Json;
 
 public class RosScoutMemory
@@ -10,11 +12,15 @@ public class RosScoutMemory
     public Dictionary<string, RosSystem> RosSystems { get; set; } = new Dictionary<string, RosSystem>();
     public Dictionary<string, RosTopic[]> RosTopics { get; set; } = new Dictionary<string, RosTopic[]>();
 
+    public Dictionary<string, ProfileConnectionState> ProfileConnectionState { get; set; } = new Dictionary<string, ProfileConnectionState>();
+
     readonly HttpClient http;
     readonly ILogger<RosScoutMemory> logger;
 
     public event EventHandler<RosProfile> ProfileDataUpdate;
+    public event EventHandler ConnectionStateUpdated;
     bool isInitialized = false;
+    private Task initilize = null;
 
     public RosScoutMemory(HttpClient http, ILogger<RosScoutMemory> logger)
     {
@@ -22,13 +28,14 @@ public class RosScoutMemory
         this.http = http;
 
         logger.LogInformation("RosScoutMemory created");
-       
+        initilize = Init();
     }
 
     public async Task Init()
     {
         if (!isInitialized)
         {
+
             logger.LogInformation("Getting profiles");
             await GetRosProfiles();
             logger.LogInformation("Scanning systems");
@@ -36,11 +43,51 @@ public class RosScoutMemory
             foreach (var profile in RosProfiles)
             {
                 logger.LogInformation($"Scanning {profile.Name}");
-                await ScanSystemData(profile);
+                try
+                {
+                    await ScanSystemData(profile);
+                }
+                catch
+                {
+
+                }
             }
+            try
+            {
+                await GetState();
+            }
+            catch { }
             isInitialized = true;
         }
-        
+    }
+
+    public  async Task GetState()
+    {
+        var connectionStates = http.GetFromJsonAsync<ProfileConnectionState[]>("api/Communication/getProfileConnectionStates");
+        await connectionStates.WaitAsync(new CancellationToken());
+
+        if (connectionStates.IsFaulted)
+        {
+            logger.LogError("Error getting connection states");
+            return;
+        }
+        else
+        {
+            foreach (var state in connectionStates.Result)
+            {
+                logger.LogInformation($"Connection state {state.robotname} master: {state.master}, bridge: {state.bridge}");
+                if (ProfileConnectionState.ContainsKey(state.robotname))
+                {
+                    ProfileConnectionState[state.robotname] = state;
+                }
+                else
+                {
+                    ProfileConnectionState.Add(state.robotname, state);
+                }
+            }
+        }
+
+        ConnectionStateUpdated?.Invoke(this, new EventArgs());
     }
 
     public RosProfile? GetRosProfile(string name)
