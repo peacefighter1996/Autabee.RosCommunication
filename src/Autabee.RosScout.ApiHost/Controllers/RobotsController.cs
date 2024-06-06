@@ -87,7 +87,7 @@ namespace Autabee.WasmHostApi.Controllers
             return Ok(validation.ToString());
         }
 
-        [HttpGet("deleteRobotSettings/{robotName}")]
+        [HttpDelete("deleteRobotSettings/{robotName}")]
         public IActionResult DeleteRobot(string robotName)
         {
             RosSettings rosSettings = GetSettings();
