@@ -56,8 +56,8 @@
                             <td>@topic.Name</td>
                             <td>@topic.Type</td>
                             <td>
-                                <button @onclick="()=>Subscribe(topic)" title="subscribe" class="mdi mdi-rss-box" />
-                                <button @onclick="()=>ShowTopicDetails(topic)" title="details" class="mdi mdi-magnify" />
+                                <button @onclick="()=>Subscribe(topic)" title="subscribe" class="mdi mdi-rss-box" ></button>
+                                <button @onclick="()=>ShowTopicDetails(topic)" title="details" class="mdi mdi-magnify"></button>
                             </td>
                         </tr>
                     }
@@ -111,7 +111,7 @@
                     {
                         <tr>
                             <td>@node</td>
-                            <td><button @onclick="()=>ShowNodeDetails(node)" title="subscribe" class="mdi mdi-magnify" /></td>
+                            <td><button @onclick="()=>ShowNodeDetails(node)" title="subscribe" class="mdi mdi-magnify" ></button></td>
                         </tr>
                     }
                 </tbody>

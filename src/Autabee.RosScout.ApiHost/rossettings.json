@@ -19,6 +19,13 @@
             "Master": "http://145.94.192.79:11311",
             "Name": "TerraDiscovery2",
             "MachineType": "TerraDiscovery"
+        },
+        {
+            "Version": "Noetic",
+            "Bridge": "ws://192.168.42.1:8001",
+            "Master": "http://192.168.42.1:11311",
+            "Name": "Cow2_8001",
+            "MachineType": "cow"
         }
     ]
 }
